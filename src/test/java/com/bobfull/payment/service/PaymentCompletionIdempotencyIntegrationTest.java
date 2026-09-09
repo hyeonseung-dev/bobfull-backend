@@ -133,7 +133,7 @@ class PaymentCompletionIdempotencyIntegrationTest {
         TimeSlot timeSlot = timeSlotRepository.saveAndFlush(TimeSlot.create(table.getId(),
                 Instant.parse("2026-08-01T02:00:00Z"), Instant.parse("2026-08-01T04:00:00Z")));
         return paymentRepository.saveAndFlush(Payment.createReady("payment-" + UUID.randomUUID(), 10L, timeSlot.getId(), null,
-                PaymentPurpose.CREATE, 1, BigDecimal.valueOf(10000), Instant.parse("2026-09-01T00:00:00Z")));
+                PaymentPurpose.CREATE, 1, BigDecimal.valueOf(10000), Instant.now().plusSeconds(3600)));
     }
 
     @TestConfiguration(proxyBeanMethods = false)

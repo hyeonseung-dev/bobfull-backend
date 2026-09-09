@@ -288,12 +288,12 @@ class PaymentReservationConfirmationTransactionIntegrationTest {
 
     private Payment readyCreatePayment(TimeSlot timeSlot, int partySize) {
         return paymentRepository.saveAndFlush(Payment.createReady(paymentId(), 10L, timeSlot.getId(), null,
-                PaymentPurpose.CREATE, partySize, BigDecimal.valueOf(10000), Instant.parse("2026-09-01T00:00:00Z")));
+                PaymentPurpose.CREATE, partySize, BigDecimal.valueOf(10000), Instant.now().plusSeconds(3600)));
     }
 
     private Payment readyJoinPayment(TimeSlot timeSlot, Reservation reservation, Long memberId, int partySize) {
         return paymentRepository.saveAndFlush(Payment.createReady(paymentId(), memberId, timeSlot.getId(), reservation.getId(),
-                PaymentPurpose.JOIN, partySize, BigDecimal.valueOf(10000), Instant.parse("2026-09-01T00:00:00Z")));
+                PaymentPurpose.JOIN, partySize, BigDecimal.valueOf(10000), Instant.now().plusSeconds(3600)));
     }
 
     private String paymentId() {

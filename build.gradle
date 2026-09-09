@@ -70,7 +70,7 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform {
-		excludeTags 'kafka-evidence'
+		excludeTags 'kafka-evidence', 'openai-evaluation'
 	}
 	// #277: 전체 suite가 한 JVM에서 수백 개의 서로 다른 Spring TestContext를 순차 기동하면서
 	// 기본 힙으로는 간헐적으로 메모리 압박(BeanCreationException 등 무작위 실패)이 발생함을
@@ -81,6 +81,17 @@ tasks.named('test') {
 			showStandardStreams = true
 		}
 	}
+}
+
+tasks.register('openAiEvaluationTest', Test) {
+	description = 'Runs OpenAI evaluation tests excluded from the default test task.'
+	group = 'verification'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'openai-evaluation'
+	}
+	maxHeapSize = '4g'
 }
 
 tasks.register('kafkaEvidenceTest', Test) {
