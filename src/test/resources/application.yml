@@ -4,6 +4,9 @@ payment:
   refund-reconciliation:
     enabled: false
 
+jwt:
+  access-token-expiration-seconds: 1800
+
 outbox:
   chat-message:
     enabled: false
