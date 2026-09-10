@@ -9,21 +9,22 @@
 
 - Closes #
 - 검토 수준: `기본 | 강화`
-- 운영 모드: `V3 Sprint Mode`
+- 운영 모드: `Personal Refactoring Mode | V3 Sprint Mode`
 
-<!-- Draft PR 생성 직후 해당 PR을 구현한 담당 AI가 별도 Human 명령 없이 skills/bobfull-pr-review/SKILL.md를 적용해 최신 Head를 독립 리뷰 패스로 검토하고 PR 댓글을 남깁니다. GitHub Copilot은 필수 구성요소가 아닙니다. -->
+<!--
+개인 리팩토링 PR은 docs/PERSONAL_REFACTORING_WORKFLOW.md와 skills/bobfull-refactoring/SKILL.md를 따릅니다.
+개인 리팩토링에서는 AI가 작성한 코드라도 Human이 설명할 수 없으면 Merge하지 않습니다.
+-->
 
 ## PR 이해 요약
 
 ### 쉬운 설명
 
-<!-- 처음 보는 팀원이 3~5문장으로 무엇을 왜 바꿨는지 이해할 수 있게 작성합니다. -->
+<!-- 처음 보는 사람이 3~5문장으로 무엇을 왜 바꿨는지 이해할 수 있게 작성합니다. -->
 
 -
 
 ### 주요 실행 흐름
-
-<!-- 실제 핵심 흐름과 중요한 분기만 작성합니다. -->
 
 1.
 2.
@@ -31,23 +32,15 @@
 
 ### Mermaid 시각화
 
-<!-- 의미 있는 실행 흐름이 있을 때만 작성합니다. 단순 문서·설정·CRUD면 `해당 없음`과 이유를 작성합니다. -->
+<!-- 의미 있는 실행 흐름 또는 구조 변화가 있을 때만 작성합니다. 단순 문서·설정·CRUD면 `해당 없음`과 이유를 작성합니다. -->
 
 해당 없음:
 
 ### 주요 개념
 
-<!-- 실제 PR 이해에 필요한 개념만 작성합니다. -->
-
 | 개념 | 쉽게 말하면 | 이 PR에서 왜 필요한가 |
 |---|---|---|
 |  |  |  |
-
-### 핵심 트러블슈팅
-
-<!-- 실제 의미 있는 문제 해결이 있었을 때만 작성합니다. 없으면 `해당 없음`과 이유를 작성합니다. -->
-
-해당 없음:
 
 ### 코드 읽는 순서
 
@@ -55,35 +48,65 @@
 2.
 3.
 
-## 상세 변경 및 검증
+## Why
 
-- 현재 Merge를 막는 위험(BLOCKER·MAJOR·FAIL):
-- Merge를 막지 않는 후속 항목(MINOR·SUGGESTION·기술부채):
+### 문제
 
-<details>
-<summary>상세 변경 및 검증 펼치기</summary>
+-
+
+### 왜 문제인가
+
+- 유지보수성:
+- 도메인 책임:
+- 테스트 난이도:
+- 변경 영향 범위:
+
+## Before
+
+### 기존 구조
+
+```text
+기존 실행 흐름 또는 책임 구조
+```
+
+### Baseline
+
+- 관련 테스트:
+- 전체 build:
+- SonarQube:
+- JaCoCo:
+- 기타 측정·재현 결과:
+
+## What
 
 ### 주요 변경
 
 -
 
-### 예외·실패·중복·경계 상황
+### 변경하지 않은 계약
 
--
+- API:
+- DB Schema:
+- 비즈니스 정책:
+- 상태 전이:
 
-### 트레이드오프
+## Why this approach
 
-<!-- 실제 설계 선택에서 얻은 것과 포기한 것이 있을 때만 작성합니다. 단순 변경이면 `해당 없음`과 이유를 작성합니다. -->
+### 검토한 방법
 
--
+| 후보 | 장점 | 단점 | 판단 |
+|---|---|---|---|
+| A |  |  |  |
+| B |  |  |  |
 
-### 현재 제한사항과 후속 개선
+### 최종 선택
 
--
+- 선택한 방법:
+- 선택 이유:
+- 선택하지 않은 방법과 이유:
+- 주요 trade-off:
 
-### 제외 범위
-
--
+## Verification
 
 ### 추가·수정 테스트
 
@@ -97,26 +120,30 @@
 |---|---|---|---|
 |  |  |  | `PASS | FAIL | NOT_RUN` |
 
-</details>
+### 필수 검증
+
+| Merge Gate | 실행 명령·환경 | 결과 | 증거·한계 |
+|---|---|---|---|
+| 관련 테스트 |  | `PASS | FAIL | NOT_RUN` |  |
+| 전체 build |  | `PASS | FAIL | NOT_RUN` |  |
+| 핵심 기능 직접 검증 | Postman/curl/직접 트리거 등 | `PASS | FAIL | NOT_RUN` |  |
+| SonarQube | 필요한 경우 | `PASS | FAIL | NOT_APPLICABLE` |  |
+| JaCoCo | 필요한 경우 | `PASS | FAIL | NOT_APPLICABLE` |  |
+| Before/After Evidence | `docs/evidence/...` 또는 N/A 근거 | `PASS | FAIL | NOT_APPLICABLE` |  |
+| 담당 구현 AI Review | PR Conversation 댓글 | `MERGEABLE | BLOCK | 미실행` |  |
+
+- 최신 검증 Commit SHA:
+- 미해결 BLOCKER:
+- 미해결 MAJOR:
+- Human 결정 필요 사항:
 
 ## Before / After Evidence
 
 <!--
-성능·신뢰성·동시성·인프라·캐시·Kafka/Outbox·AI 등 개선 효과를 주장하는 PR은 작성합니다.
-단순 CRUD·문서·DTO처럼 Before/After 비교가 의미 없으면 `NOT_APPLICABLE`과 이유를 작성합니다.
-실제 측정 전 임의 수치를 채우지 않습니다.
-공통 규칙: docs/evidence/v3/README.md
+성능·신뢰성·동시성·인프라·캐시·Kafka/Outbox·AI뿐 아니라 개인 리팩토링의 구조 개선 근거도 작성합니다.
+정량 KPI가 의미 없으면 NOT_APPLICABLE 이유와 대신 사용한 구조·테스트·복잡도·의존성 근거를 작성합니다.
+실제 측정 전 임의 수치를 작성하지 않습니다.
 -->
-
-### 측정 계약
-
-<!-- Issue/Evidence에 정의된 대표 지표를 요약합니다. 정량 KPI가 의미 없는 신뢰성 문제는 검증 가능한 현상을 적습니다. -->
-
-- Primary KPI:
-- Secondary KPI:
-- Guardrail:
-
-### Evidence 결과
 
 - Evidence 판정: `PASS | FAIL | NOT_APPLICABLE`
 - Evidence 경로:
@@ -132,43 +159,130 @@
 
 ### 정합성 회귀 확인
 
-<!-- 성능·격리·확장 개선 뒤 기존 기능·상태·멱등성·정합성이 깨지지 않았는지 기록합니다. -->
+-
+
+## AI Usage
+
+### AI가 한 일
+
+- 코드 구조 분석:
+- 문제·원인 후보:
+- 대안 제안:
+- 구현 초안:
+- 테스트 후보:
+- Diff Self Review:
+
+### Human이 직접 판단·검증한 일
 
 -
 
-## V3 Sprint 필수 검증
+### AI 제안을 그대로 수용한 부분
 
-<!-- 기능 PR은 아래 항목을 우선합니다. 문서·설정 전용이면 해당하지 않는 항목에 NOT_RUN/N/A 이유를 적습니다. -->
+- 제안:
+- 수용 이유:
 
-| Merge Gate | 실행 명령·환경 | 결과 | 증거·한계 |
-|---|---|---|---|
-| 관련 테스트 |  | `PASS | FAIL | NOT_RUN` |  |
-| 전체 build |  | `PASS | FAIL | NOT_RUN` |  |
-| 핵심 기능 직접 검증 | Postman/curl/직접 트리거 등 | `PASS | FAIL | NOT_RUN` |  |
-| Before/After Evidence | `docs/evidence/v3/...` 또는 N/A 근거 | `PASS | FAIL | NOT_APPLICABLE` |  |
-| 담당 구현 AI Review | PR Conversation 댓글 | `MERGEABLE | BLOCK | 미실행` |  |
+### AI 제안을 수정하거나 거부한 부분
 
-- 최신 검증 Commit SHA:
-- 미해결 BLOCKER:
-- 미해결 MAJOR:
-- Human 결정 필요 사항:
-- Merge를 막지 않는 MINOR/SUGGESTION:
+- 제안:
+- 최종 판단:
+- 이유:
 
-## Human 이해 확인
+## 핵심 트러블슈팅
 
-### Human 이해도
-
-<!-- 기본: 질문 0개, 아래 문구 유지. 강화: 아래 문구를 제거하고 정확히 3문항을 삽입합니다. -->
-
-해당 없음: 기본 검토
-
-<!-- 강화 PR 3문항 축
-1. 핵심 실행 흐름과 주요 분기
-2. 가장 중요한 기술 개념과 실제 적용 이유
-3. 설계 선택 이유, 주요 실패 처리와 남은 한계
+<!--
+실제 의미 있는 문제 해결이 있었을 때만 작성합니다.
+원본 구조: 문제 → 재현 → 원인 가설 → 확인 → 근본 원인 → 대안 비교 → 선택 → 구현 → 검증 → Before/After → 결과 → 한계
+없으면 `해당 없음`과 이유를 작성합니다.
 -->
 
-### 담당 구현 AI Review·반영 기록
+- Troubleshooting 후보: `YES | NO`
+- 이유:
+- 원본 기록 경로:
+
+## Human Understanding Gate
+
+<!-- 개인 리팩토링 PR에서는 아래 질문에 Human이 자기 말로 답할 수 있어야 Merge합니다. -->
+
+### Q1. 기존 구조는 어떻게 동작했고 왜 문제였는가?
+
+**Human 답변:**
+
+-
+
+### Q2. 어떤 대안을 검토했고 왜 현재 방법을 선택했는가?
+
+**Human 답변:**
+
+-
+
+### Q3. 이 변경과 관련된 핵심 Java/Spring 개념은 무엇인가?
+
+**Human 답변:**
+
+-
+
+### Q4. 무엇으로 개선과 회귀 없음을 검증했는가?
+
+**Human 답변:**
+
+-
+
+### Q5. 현재 구조의 한계와 trade-off는 무엇인가?
+
+**Human 답변:**
+
+-
+
+## Interview Check
+
+- [ ] 코드 없이 기존 실행 흐름을 설명할 수 있다.
+- [ ] 왜 리팩토링했는지 설명할 수 있다.
+- [ ] 검토한 대안과 선택 이유를 설명할 수 있다.
+- [ ] 관련 Java/Spring 개념을 설명할 수 있다.
+- [ ] 검증 방법과 결과를 설명할 수 있다.
+- [ ] 현재 구조의 한계와 trade-off를 설명할 수 있다.
+- [ ] AI가 작성한 핵심 코드도 내가 설명할 수 있다.
+
+### 예상 꼬리질문
+
+1.
+2.
+3.
+
+## Output Gate
+
+### Troubleshooting
+
+- 후보: `YES | NO`
+- 이유:
+- 저장 위치:
+
+### Tech Blog
+
+<!-- 아래 중 2개 이상이면 후보로 검토합니다. -->
+
+- [ ] 명확한 문제
+- [ ] 원인 분석 과정
+- [ ] 대안 비교
+- [ ] 기술적 판단
+- [ ] Before/After 또는 객관적 검증
+- [ ] 다른 개발자에게 재사용 가치
+- [ ] 기술면접 가치
+
+- 후보: `YES | NO`
+- 핵심 메시지:
+
+### Interview Note
+
+- 후보: `YES | NO`
+- 정리할 핵심 개념:
+
+### Portfolio Candidate
+
+- 후보: `YES | NO`
+- 문제 해결 역량을 보여주는 지점:
+
+## 담당 구현 AI Review·반영 기록
 
 - Review Skill: `skills/bobfull-pr-review/SKILL.md`
 - 최신 Review 기준 Head:
@@ -178,26 +292,20 @@
 - MINOR/SUGGESTION 후속 처리:
 - 리뷰 후 재실행 검증:
 
-### Human 이해 Checklist
+## Merge Gate
 
-<!-- 별도 리뷰어 Approve Gate가 아니라 담당자와 팀원이 PR을 빠르게 이해하기 위한 기준입니다. -->
-
-- [ ] 이 PR이 무엇을 왜 변경하는지 이해했다.
-- [ ] 기본 실행 흐름과 중요한 분기를 이해했다.
-- [ ] 중요한 기술 개념과 주요 트레이드오프가 있다면 어디에 왜 적용됐는지 이해했다.
-- [ ] 전체 build·직접 검증·필요한 Before/After Evidence·담당 구현 AI Review 결과와 남은 위험을 확인했다.
-
-## V3 Sprint Merge Gate
-
-<!-- 필수 Human Approve: 0명 -->
-
+- [ ] Issue 범위 밖 변경 없음
+- [ ] 관련 테스트 `PASS` 또는 해당 없음 근거 명확
 - [ ] 전체 build `PASS` 또는 해당 없음 근거 명확
-- [ ] 변경 핵심 기능 직접 검증 `PASS` 또는 해당 없음 근거 명확
-- [ ] 고도화 PR이면 Before/After Evidence `PASS` 또는 `NOT_APPLICABLE` 근거 명확
+- [ ] 핵심 기능 직접 검증 `PASS` 또는 해당 없음 근거 명확
+- [ ] 필요한 Before/After Evidence `PASS` 또는 `NOT_APPLICABLE` 근거 명확
+- [ ] 필요한 SonarQube·JaCoCo 검증 완료
 - [ ] 최신 Head 담당 구현 AI Review 완료
 - [ ] 미해결 `BLOCKER` 없음
 - [ ] 미해결 `MAJOR` 없음
 - [ ] Human 결정 필요 사항 없음
-- [ ] 강화 PR인 경우 Human 이해도 3문항 완료
+- [ ] 개인 리팩토링 PR이면 Human Understanding Gate 완료
+- [ ] AI가 작성한 핵심 코드를 Human이 설명할 수 있음
+- [ ] Output Gate 판정 완료
 
-`MINOR`와 `SUGGESTION`은 기록 후 Merge를 막지 않습니다.
+최종 Merge는 Human이 수행합니다.
