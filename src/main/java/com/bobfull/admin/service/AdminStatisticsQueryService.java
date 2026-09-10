@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** ADMIN의 운영 지표·통계 조회를 담당한다(Issue #49 §11-9~11-11). */
 @Service
 public class AdminStatisticsQueryService {
 

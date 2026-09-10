@@ -23,7 +23,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-/** ADMIN 운영 통계(§11-10, §11-11)의 집계 조회를 담당한다(Issue #49). */
 @Repository
 public class AdminStatisticsRepositoryImpl implements AdminStatisticsRepository {
 

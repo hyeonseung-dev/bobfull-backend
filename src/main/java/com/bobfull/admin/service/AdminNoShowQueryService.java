@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** ADMIN의 전체 노쇼 현황 조회를 담당한다(Issue #134 §11-8). */
 @Service
 public class AdminNoShowQueryService {
 

@@ -15,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** ADMIN의 전체 결제 현황 조회를 담당한다(Issue #49 §11-6). */
 @Service
 public class AdminPaymentQueryService {
 
