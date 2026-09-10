@@ -1,0 +1,17 @@
+{
+  "projectKey": "bobfull-backend-refactor-baseline",
+  "measures": {
+    "bugs": 14,
+    "vulnerabilities": 0,
+    "security_hotspots": 4,
+    "code_smells": 243,
+    "duplicated_lines": 236,
+    "duplicated_lines_density": 1.3,
+    "coverage": 84.6,
+    "line_coverage": 88.1,
+    "branch_coverage": 72.5,
+    "complexity": 2158,
+    "cognitive_complexity": 867,
+    "ncloc": 14537
+  }
+}

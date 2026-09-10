@@ -1,7 +1,9 @@
 plugins {
 	id 'java'
+	id 'jacoco'
 	id 'org.springframework.boot' version '4.1.0'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.sonarqube' version '7.5.0.8588'
 }
 
 group = 'com.bobfull'
@@ -80,6 +82,23 @@ tasks.named('test') {
 		testLogging {
 			showStandardStreams = true
 		}
+	}
+}
+
+tasks.named('jacocoTestReport') {
+	dependsOn tasks.named('test')
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
+	}
+}
+
+sonar {
+	properties {
+		property 'sonar.projectKey', 'bobfull-backend-refactor-baseline'
+		property 'sonar.projectName', 'BobFull Backend Refactor Baseline'
+		property 'sonar.coverage.jacoco.xmlReportPaths', layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml').get().asFile
 	}
 }
 
