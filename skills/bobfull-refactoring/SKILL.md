@@ -20,6 +20,7 @@ description: BobFull 개인 리팩토링 Issue에서 문제 정의, AI 분석, H
 
 - Issue는 분석과 구현 과정의 작업 공간이다.
 - PR은 최종 결과 문서다.
+- PR 제목은 반드시 한글로 작성한다. 기술명이나 고유명사 외에는 불필요한 영어를 쓰지 않는다.
 - PR 첫 화면에는 결과가 먼저 나와야 한다.
 - 코드 변경 PR에는 실제 코드 Before / After를 반드시 넣는다.
 - 구현 과정을 길게 복사하지 않는다.
@@ -105,6 +106,8 @@ Before와 After는 동일 조건을 우선한다.
 
 ## 5. PR 작성 규칙
 
+PR 제목은 한글로 작성한다. 예: `예약 도메인 불필요 주석 정리`.
+
 PR은 아래 순서를 고정한다.
 
 ```text
@@ -175,6 +178,7 @@ public class RestaurantReservationController {
 - 설명하기 어려운 AI 생성 코드
 - PR의 Before / After가 실제 Diff와 일치하는지
 - PR 첫 화면에서 결과가 바로 이해되는지
+- PR 제목이 한글인지
 
 BLOCKER와 MAJOR는 수정 후 재검증한다.
 
