@@ -1,12 +1,14 @@
 ---
 name: 개인 리팩토링
 about: 현재 동작을 유지하면서 구조를 개선하고, AI 활용·검증·면접·트러블슈팅 산출물까지 연결합니다.
-title: "[v3][refactor] "
+title: ""
 labels: ""
 assignees: ""
 ---
 
 <!--
+Issue 제목은 docs/ISSUE_TITLE_RULES.md에 따라 [v1|v2|v3|project][refactor] 작업 내용 형식으로 작성합니다.
+버전은 현재 날짜가 아니라 실제 변경 대상 기능의 확정 범위로 판단합니다.
 개인 리팩토링은 docs/PERSONAL_REFACTORING_WORKFLOW.md와 skills/bobfull-refactoring/SKILL.md를 따릅니다.
 한 Issue에는 하나의 주요 목적만 둡니다.
 설명할 수 없는 AI 생성 코드는 Merge하지 않습니다.
