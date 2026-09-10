@@ -4,7 +4,6 @@ import com.bobfull.common.support.MemberNameMasker;
 import com.bobfull.reservation.entity.ParticipationStatus;
 import com.bobfull.reservation.entity.ReservationParticipant;
 
-/** §9-1 노쇼 처리 대상 참여자 조회 응답이다(Issue #48). */
 public record NoShowCandidateResponse(
         Long participationId,
         Long memberId,

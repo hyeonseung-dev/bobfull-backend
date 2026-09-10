@@ -49,9 +49,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * API에서는 diningSession, 내부 영속 모델에서는 TimeSlot으로 다루는 회차 서비스다.
- */
 @Service
 public class TimeSlotService {
 

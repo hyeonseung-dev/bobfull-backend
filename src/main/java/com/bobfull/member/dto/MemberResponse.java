@@ -4,10 +4,7 @@ import com.bobfull.common.security.MemberRole;
 import com.bobfull.member.entity.Member;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-/**
- * 내 정보 조회 응답이다.
- * businessNumber는 OWNER만 값을 가지며, MEMBER는 null이라 응답에서 생략된다.
- */
+/** businessNumber는 OWNER만 값을 가지며, MEMBER는 null이라 응답에서 생략된다. */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record MemberResponse(
         Long memberId,

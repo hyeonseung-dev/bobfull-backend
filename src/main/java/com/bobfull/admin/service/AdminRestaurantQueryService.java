@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * ADMIN의 식당 목록·상세 조회를 담당한다(Issue #49).
  * Fragment 인터페이스(AdminRestaurantRepository) 대신 합성된 {@link RestaurantRepository}를 주입한다
  * (Fragment 인터페이스를 직접 주입하면 Spring이 구현체를 별도 Bean으로도 등록해 중복 Bean 오류가 난다).
  */

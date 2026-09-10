@@ -2,7 +2,6 @@ package com.bobfull.chat.adapter;
 
 import org.springframework.ai.openai.OpenAiChatOptions;
 
-/** Moderation 요청에만 적용하는 OpenAI runtime option 계약이다. */
 final class ModerationOpenAiOptions {
     private ModerationOpenAiOptions() {
     }

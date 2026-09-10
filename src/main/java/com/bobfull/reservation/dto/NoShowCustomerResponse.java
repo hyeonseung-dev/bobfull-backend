@@ -4,7 +4,6 @@ import com.bobfull.common.support.MemberNameMasker;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
-/** §9-5 식당 노쇼 고객 조회 응답이다(Issue #48). */
 public record NoShowCustomerResponse(
         Long memberId,
         String name,

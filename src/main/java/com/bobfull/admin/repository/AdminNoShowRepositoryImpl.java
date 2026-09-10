@@ -22,7 +22,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-/** ADMIN 전체 노쇼 현황 조회(§11-8)를 담당한다(Issue #134). */
 @Repository
 public class AdminNoShowRepositoryImpl implements AdminNoShowRepository {
 

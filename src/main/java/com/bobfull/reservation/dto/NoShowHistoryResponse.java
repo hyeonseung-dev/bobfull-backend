@@ -4,7 +4,6 @@ import com.bobfull.common.support.MemberNameMasker;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
-/** §9-4 예약별 노쇼 이력 조회 응답이다(Issue #48). */
 public record NoShowHistoryResponse(
         Long noShowHistoryId,
         Long participationId,

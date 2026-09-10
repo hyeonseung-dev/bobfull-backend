@@ -2,7 +2,6 @@ package com.bobfull.admin.dto;
 
 import java.time.Instant;
 
-/** §11-8 전체 노쇼 현황 조회의 조회 결과 1건이다(Issue #134). */
 public record AdminNoShowResult(
         Long noShowHistoryId,
         Long memberId,

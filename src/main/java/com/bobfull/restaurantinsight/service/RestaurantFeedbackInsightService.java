@@ -30,7 +30,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** ChatMessage에서 식당을 역추적해 파생 결과를 만들고 OWNER용 익명 집계를 제공한다. */
+/** OWNER 집계에는 원문 대신 익명 파생 결과만 제공한다. */
 @Service
 public class RestaurantFeedbackInsightService {
     private static final long MINIMUM_DISTINCT_SENDERS = 3;

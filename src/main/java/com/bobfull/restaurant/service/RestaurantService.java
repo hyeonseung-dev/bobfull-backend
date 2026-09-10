@@ -181,8 +181,6 @@ public class RestaurantService {
         Restaurant restaurant = findActiveOrThrow(restaurantId);
         validateOwnership(restaurant, ownerMemberId);
 
-        // 합석 테이블·회차·예약 도메인이 아직 없어 연결 데이터 검사를 하지 않는다.
-        // 해당 도메인 구현 시 활성 데이터가 있으면 여기서 RestaurantErrorCode.RESTAURANT_DELETE_NOT_ALLOWED를 던져야 한다(Issue #31 결정 2).
         restaurant.softDelete(clock.instant());
         bumpSearchCacheVersionAfterCommit();
         return RestaurantIdResponse.from(restaurant);

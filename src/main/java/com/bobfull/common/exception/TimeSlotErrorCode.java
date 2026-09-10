@@ -2,9 +2,6 @@ package com.bobfull.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-/**
- * 회차 도메인 전용 에러 코드다.
- */
 public enum TimeSlotErrorCode implements BaseErrorCode {
 
     SESSION_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "sessionId에 해당하는 대상을 찾을 수 없습니다."),

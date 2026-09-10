@@ -2,9 +2,6 @@ package com.bobfull.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-/**
- * 예약 도메인 전용 에러 코드다.
- */
 public enum ReservationErrorCode implements BaseErrorCode {
 
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "대상 회차 또는 예약을 찾을 수 없습니다."),
