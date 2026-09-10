@@ -39,7 +39,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** OWNER의 식당별 예약 목록·상세·참여자 조회를 담당한다(Issue #147 §6-11~6-13). */
 @Service
 public class OwnerReservationQueryService {
 

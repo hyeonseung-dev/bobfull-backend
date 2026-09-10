@@ -45,7 +45,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** OWNER의 참여자별 노쇼 처리·해제·이력 조회를 담당한다(Issue #48 §9-1~9-5). */
 @Service
 public class NoShowService {
 
