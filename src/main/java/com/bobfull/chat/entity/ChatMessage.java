@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
-/** 채팅방 메시지 이력이다. 다음 STOMP 단계에서만 생성한다. */
 @Entity
 @Table(name = "chat_message", indexes = @Index(name = "idx_chat_message_room_id", columnList = "chat_room_id,chat_message_id"))
 public class ChatMessage extends BaseTimeEntity {

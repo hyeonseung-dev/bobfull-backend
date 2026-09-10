@@ -2,9 +2,6 @@ package com.bobfull.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-/**
- * 합석 테이블 도메인 전용 에러 코드다.
- */
 public enum SharedTableErrorCode implements BaseErrorCode {
 
     INVALID_TABLE_CAPACITY(HttpStatus.BAD_REQUEST, "capacity는 2, 4, 6, 8 중 하나여야 합니다."),

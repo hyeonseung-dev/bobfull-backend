@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * ADMIN의 회원 목록·상세 조회를 담당한다(Issue #49).
  * QueryDSL 커스텀 조회는 {@link MemberRepository}에 합성된 것을 사용한다 — Fragment 인터페이스
  * (AdminMemberRepository) 자체를 주입하면 Spring이 그 구현체를 별도 Bean으로도 등록해
  * NoUniqueBeanDefinitionException이 발생한다.
