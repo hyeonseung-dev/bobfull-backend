@@ -35,14 +35,14 @@ public class PortOneRefundGatewayAdapter implements PortOneRefundRequester {
 
     @Override
     public RefundResult request(String paymentId, BigDecimal amount, String reason, String idempotencyKey) {
-        Map<?, ?> response = restClient.post().uri("/payments/{paymentId}/cancel", paymentId)
+        Map<?, ?> cancellationResponse = restClient.post().uri("/payments/{paymentId}/cancel", paymentId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "PortOne " + properties.apiSecret())
                 .header("Idempotency-Key", "\"" + idempotencyKey + "\"")
                 .body(new CancelRequest(properties.storeId(), amount.longValueExact(), reason))
                 .retrieve().body(Map.class);
-        Object cancellationValue = response == null ? null : response.get("cancellation");
-        Map<?, ?> cancellation = cancellationValue instanceof Map<?, ?> value ? value : null;
+        Object cancellationValue = cancellationResponse == null ? null : cancellationResponse.get("cancellation");
+        Map<?, ?> cancellation = cancellationValue instanceof Map<?, ?> cancellationMap ? cancellationMap : null;
         String cancellationId = cancellation == null ? null : (String) cancellation.get("id");
         String status = cancellation == null ? null : (String) cancellation.get("status");
         if (cancellationId == null || status == null) throw new IllegalStateException("PortOne cancellation response is incomplete");

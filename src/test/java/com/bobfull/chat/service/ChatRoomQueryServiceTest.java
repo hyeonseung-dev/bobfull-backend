@@ -36,9 +36,9 @@ class ChatRoomQueryServiceTest {
         given(access.read(10L, 2L)).willReturn(new ReservationChatAccessReader.ChatAccess(3L, ParticipationStatus.CANCELLED));
 
         // when & then
-        assertAccessDenied(() -> service.get(1L, MemberRole.MEMBER, 10L));
-        assertAccessDenied(() -> service.get(2L, MemberRole.MEMBER, 10L));
-        assertAccessDenied(() -> service.get(3L, MemberRole.OWNER, 10L));
+        assertAccessDenied(() -> service.getChatRoom(1L, MemberRole.MEMBER, 10L));
+        assertAccessDenied(() -> service.getChatRoom(2L, MemberRole.MEMBER, 10L));
+        assertAccessDenied(() -> service.getChatRoom(3L, MemberRole.OWNER, 10L));
         org.mockito.Mockito.verifyNoInteractions(chatRoomCreationService);
     }
 
@@ -49,7 +49,7 @@ class ChatRoomQueryServiceTest {
         given(rooms.findByReservationId(10L)).willReturn(Optional.of(room(3L, 10L)));
 
         // when
-        var response = service.get(7L, MemberRole.MEMBER, 10L);
+        var response = service.getChatRoom(7L, MemberRole.MEMBER, 10L);
 
         // then
         assertThat(response.chatRoomId()).isEqualTo(3L);
@@ -64,7 +64,7 @@ class ChatRoomQueryServiceTest {
         given(chatRoomCreationService.createIfAbsent(10L)).willReturn(room(3L, 10L));
 
         // when
-        var response = service.get(7L, MemberRole.MEMBER, 10L);
+        var response = service.getChatRoom(7L, MemberRole.MEMBER, 10L);
 
         // then
         assertThat(response.chatRoomId()).isEqualTo(3L);
@@ -83,7 +83,7 @@ class ChatRoomQueryServiceTest {
 
         // when & then
         try {
-            assertThatThrownBy(() -> service.get(7L, MemberRole.MEMBER, 10L))
+            assertThatThrownBy(() -> service.getChatRoom(7L, MemberRole.MEMBER, 10L))
                     .isInstanceOf(CustomException.class)
                     .extracting(exception -> ((CustomException) exception).getErrorCode())
                     .isEqualTo(ChatErrorCode.CHAT_ROOM_NOT_READY);

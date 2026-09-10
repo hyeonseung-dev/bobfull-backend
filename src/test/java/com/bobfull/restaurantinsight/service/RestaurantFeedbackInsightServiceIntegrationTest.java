@@ -78,7 +78,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     @Test
     void activePromptVersion_v1으로_분석을_저장한다() {
         Long id = fixture("탕수육 맛 좋아요");
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1")).isPresent();
         assertThat(items.count()).isEqualTo(1);
         assertThat(provider.calls.get()).isEqualTo(1);
@@ -88,7 +88,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     void activePromptVersion_v2로_분석을_저장한다() {
         ReflectionTestUtils.setField(service, "activePromptVersion", "v2");
         Long id = fixture("탕수육 맛 좋아요");
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v2")).isPresent();
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1")).isEmpty();
         assertThat(items.count()).isEqualTo(1);
@@ -99,12 +99,12 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     @Test
     void v1_v2는_동일_메시지에서_공존하고_서로_수정되지_않는다() {
         Long id = fixture("탕수육 맛 좋아요");
-        service.analyze(id); // v1
+        service.analyzeMessage(id); // v1
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1")).isPresent();
 
         ReflectionTestUtils.setField(service, "activePromptVersion", "v2");
         provider.result = List.of(new RestaurantFeedbackAnalysis.Item(FeedbackCategory.FOOD, FeedbackAspectType.MENU, "짜장면", FeedbackOpinionType.SALTINESS, FeedbackSentiment.NEGATIVE));
-        service.analyze(id); // v2, v1 short-circuit되면 안 됨
+        service.analyzeMessage(id); // v2, v1 short-circuit되면 안 됨
 
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1")).isPresent();
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v2")).isPresent();
@@ -123,7 +123,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
                 new RestaurantFeedbackAnalysis.Item(FeedbackCategory.FOOD, FeedbackAspectType.MENU, "짜장면", FeedbackOpinionType.SALTINESS, FeedbackSentiment.NEGATIVE),
                 new RestaurantFeedbackAnalysis.Item(FeedbackCategory.SERVICE, FeedbackAspectType.SERVICE, "직원 응대", FeedbackOpinionType.FRIENDLINESS, FeedbackSentiment.POSITIVE)
         );
-        service.analyze(fixture("탕수육 짜장면 직원 서비스 후기"));
+        service.analyzeMessage(fixture("탕수육 짜장면 직원 서비스 후기"));
         assertThat(analyses.count()).isEqualTo(1);
         assertThat(items.count()).isEqualTo(3);
         var all = items.findAll();
@@ -147,11 +147,11 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     void MENU가_아닌_aspectType은_LLM_문구와_무관하게_canonical_normalizedAspect로_수렴한다() {
         provider.result = List.of(new RestaurantFeedbackAnalysis.Item(
                 FeedbackCategory.SERVICE, FeedbackAspectType.SERVICE, "직원 친절함", FeedbackOpinionType.FRIENDLINESS, FeedbackSentiment.POSITIVE));
-        service.analyze(fixture("직원 친절했어요"));
+        service.analyzeMessage(fixture("직원 친절했어요"));
 
         provider.result = List.of(new RestaurantFeedbackAnalysis.Item(
                 FeedbackCategory.SERVICE, FeedbackAspectType.SERVICE, "친절", FeedbackOpinionType.FRIENDLINESS, FeedbackSentiment.POSITIVE));
-        service.analyze(fixture("직원 친절했어요"));
+        service.analyzeMessage(fixture("직원 친절했어요"));
 
         assertThat(analyses.count()).isEqualTo(2);
         assertThat(items.count()).isEqualTo(2);
@@ -166,7 +166,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     void ETC_opinionType은_canonicalize하지_않고_검증된_LLM_aspect를_유지한다() {
         provider.result = List.of(new RestaurantFeedbackAnalysis.Item(
                 FeedbackCategory.SERVICE, FeedbackAspectType.SERVICE, "주차 공간 문의 대응", FeedbackOpinionType.ETC, FeedbackSentiment.POSITIVE));
-        service.analyze(fixture("주차 관련 문의에 친절하게 답해주셨어요"));
+        service.analyzeMessage(fixture("주차 관련 문의에 친절하게 답해주셨어요"));
 
         assertThat(items.count()).isEqualTo(1);
         assertThat(items.findAll().get(0).getNormalizedAspect()).isEqualTo("주차 공간 문의 대응");
@@ -182,7 +182,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
                 new RestaurantFeedbackAnalysis.Item(FeedbackCategory.FOOD, FeedbackAspectType.ETC, "반찬", FeedbackOpinionType.TASTE, FeedbackSentiment.POSITIVE),
                 new RestaurantFeedbackAnalysis.Item(FeedbackCategory.FOOD, FeedbackAspectType.ETC, "소스", FeedbackOpinionType.TASTE, FeedbackSentiment.POSITIVE)
         );
-        service.analyze(fixture("국물도 반찬도 소스도 다 맛있었어요"));
+        service.analyzeMessage(fixture("국물도 반찬도 소스도 다 맛있었어요"));
 
         assertThat(items.count()).isEqualTo(3);
         assertThat(items.findAll())
@@ -196,7 +196,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
                 new RestaurantFeedbackAnalysis.Item(FeedbackCategory.FOOD, FeedbackAspectType.MENU, "탕수육", FeedbackOpinionType.TEXTURE, FeedbackSentiment.POSITIVE),
                 new RestaurantFeedbackAnalysis.Item(FeedbackCategory.FOOD, FeedbackAspectType.MENU, "010-1234-5678", FeedbackOpinionType.TEXTURE, FeedbackSentiment.POSITIVE)
         );
-        service.analyze(fixture("탕수육 맛 좋아요"));
+        service.analyzeMessage(fixture("탕수육 맛 좋아요"));
         assertThat(analyses.count()).isEqualTo(1);
         assertThat(items.count()).isEqualTo(1);
         assertThat(analyses.findAll().get(0).getStatus()).isEqualTo(RestaurantFeedbackAnalysisStatus.COMPLETED);
@@ -210,13 +210,13 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
                 new RestaurantFeedbackAnalysis.Item(FeedbackCategory.SERVICE, FeedbackAspectType.SERVICE, "김철수님", FeedbackOpinionType.FRIENDLINESS, FeedbackSentiment.POSITIVE)
         );
         Long id = fixture("탕수육 맛 좋아요");
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(analyses.count()).isEqualTo(1);
         assertThat(items.count()).isZero();
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1").orElseThrow().getStatus())
                 .isEqualTo(RestaurantFeedbackAnalysisStatus.EXCLUDED_OUTPUT_VALIDATION);
 
-        service.analyze(id); // redelivery
+        service.analyzeMessage(id); // redelivery
         assertThat(analyses.count()).isEqualTo(1);
         assertThat(items.count()).isZero();
         assertThat(provider.calls.get()).isEqualTo(1);
@@ -226,7 +226,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     @Test
     void 입력에_PII가_있으면_Provider_호출_없이_EXCLUDED_INPUT_PII로_제외한다() {
         Long id = fixture("맛있었어요 010-1234-5678로 연락주세요");
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(provider.calls.get()).isZero();
         assertThat(items.count()).isZero();
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1").orElseThrow().getStatus())
@@ -237,7 +237,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     @Test
     void 식당_관련_키워드가_없으면_Candidate_Gate에서_Provider_호출_없이_EXCLUDED_CANDIDATE로_제외한다() {
         Long id = fixture("내일 몇 시에 만날까요");
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(provider.calls.get()).isZero();
         assertThat(items.count()).isZero();
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1").orElseThrow().getStatus())
@@ -250,13 +250,13 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
         provider.relevant = false;
         provider.result = List.of(new RestaurantFeedbackAnalysis.Item(FeedbackCategory.FOOD, FeedbackAspectType.MENU, "탕수육", FeedbackOpinionType.TEXTURE, FeedbackSentiment.POSITIVE));
         Long id = fixture("탕수육 맛 좋아요");
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(provider.calls.get()).isEqualTo(1);
         assertThat(items.count()).isZero();
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1").orElseThrow().getStatus())
                 .isEqualTo(RestaurantFeedbackAnalysisStatus.EXCLUDED_OUTPUT_VALIDATION);
 
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(provider.calls.get()).isEqualTo(1);
         assertThat(analyses.count()).isEqualTo(1);
         assertThat(items.count()).isZero();
@@ -267,13 +267,13 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     void items가_비어있으면_제외하고_재전달시_Provider를_재호출하지_않는다() {
         provider.result = List.of();
         Long id = fixture("탕수육 맛 좋아요");
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(provider.calls.get()).isEqualTo(1);
         assertThat(items.count()).isZero();
         assertThat(analyses.findByMessageIdAndPromptVersion(id, "v1").orElseThrow().getStatus())
                 .isEqualTo(RestaurantFeedbackAnalysisStatus.EXCLUDED_OUTPUT_VALIDATION);
 
-        service.analyze(id);
+        service.analyzeMessage(id);
         assertThat(provider.calls.get()).isEqualTo(1);
         assertThat(analyses.count()).isEqualTo(1);
     }
@@ -282,14 +282,14 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
     @Test
     void 순차_재전달은_Analysis_Item_Provider_증가를_유발하지_않는다() {
         Long id = fixture("탕수육 맛 좋아요");
-        service.analyze(id);
+        service.analyzeMessage(id);
         long analysesAfterFirst = analyses.count();
         long itemsAfterFirst = items.count();
         int callsAfterFirst = provider.calls.get();
 
-        service.analyze(id);
-        service.analyze(id);
-        service.analyze(id);
+        service.analyzeMessage(id);
+        service.analyzeMessage(id);
+        service.analyzeMessage(id);
 
         assertThat(analyses.count()).isEqualTo(analysesAfterFirst);
         assertThat(items.count()).isEqualTo(itemsAfterFirst);
@@ -313,7 +313,7 @@ class RestaurantFeedbackInsightServiceIntegrationTest {
                 pool.submit(() -> {
                     ready.countDown();
                     try { start.await(10, TimeUnit.SECONDS); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
-                    try { service.analyze(id); } catch (Throwable failure) { unexpectedFailures.add(failure); }
+                    try { service.analyzeMessage(id); } catch (Throwable failure) { unexpectedFailures.add(failure); }
                 });
             }
             ready.await(10, TimeUnit.SECONDS);

@@ -56,8 +56,8 @@ public class RefreshTokenStore {
     }
 
     private Optional<Long> findMemberId(String refreshToken) {
-        String value = redisTemplate.opsForValue().get(tokenKey(refreshToken));
-        return Optional.ofNullable(value).map(Long::parseLong);
+        String memberIdValue = redisTemplate.opsForValue().get(tokenKey(refreshToken));
+        return Optional.ofNullable(memberIdValue).map(Long::parseLong);
     }
 
     private void deleteExistingTokenOf(Long memberId) {

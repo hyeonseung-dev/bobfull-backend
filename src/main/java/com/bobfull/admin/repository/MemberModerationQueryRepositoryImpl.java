@@ -130,7 +130,7 @@ public class MemberModerationQueryRepositoryImpl implements MemberModerationQuer
                 .fetch()
                 .stream()
                 .collect(Collectors.toMap(row -> row.get(moderation.riskLevel),
-                        row -> value(row.get(moderation.messageId.countDistinct()))));
+                        row -> zeroIfNull(row.get(moderation.messageId.countDistinct()))));
     }
 
     private NumberExpression<Long> distinctMessageCountForCategory(
@@ -156,16 +156,16 @@ public class MemberModerationQueryRepositoryImpl implements MemberModerationQuer
     private MemberModerationSummaryResult toSummary(
             Tuple row, QChatMessage message, QChatModeration moderation, EnumPath<ModerationCategory> category) {
         return new MemberModerationSummaryResult(
-                row.get(message.senderMemberId), value(row.get(distinctMessageCountForCategory(moderation, category, ModerationCategory.PROFANITY))),
-                value(row.get(distinctMessageCountForCategory(moderation, category, ModerationCategory.PERSONAL_INFORMATION))),
-                value(row.get(distinctMessageCountForCategory(moderation, category, ModerationCategory.SPAM))),
-                value(row.get(moderation.messageId.countDistinct())),
-                value(row.get(distinctMessageCountForRisk(moderation, RiskLevel.MEDIUM, RiskLevel.HIGH))),
+                row.get(message.senderMemberId), zeroIfNull(row.get(distinctMessageCountForCategory(moderation, category, ModerationCategory.PROFANITY))),
+                zeroIfNull(row.get(distinctMessageCountForCategory(moderation, category, ModerationCategory.PERSONAL_INFORMATION))),
+                zeroIfNull(row.get(distinctMessageCountForCategory(moderation, category, ModerationCategory.SPAM))),
+                zeroIfNull(row.get(moderation.messageId.countDistinct())),
+                zeroIfNull(row.get(distinctMessageCountForRisk(moderation, RiskLevel.MEDIUM, RiskLevel.HIGH))),
                 row.get(moderation.analyzedAt.max()));
     }
 
-    private long value(Long value) {
-        return value == null ? 0 : value;
+    private long zeroIfNull(Long count) {
+        return count == null ? 0 : count;
     }
 
     private boolean isReviewTarget(RiskLevel riskLevel) {

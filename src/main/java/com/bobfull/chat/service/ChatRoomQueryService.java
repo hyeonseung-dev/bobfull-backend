@@ -32,7 +32,7 @@ public class ChatRoomQueryService {
      * 결과를 그대로 응답에 사용한다(같은 read-only 트랜잭션에서 다시 조회하면 격리 수준에
      * 따라 방금 커밋된 행을 못 볼 수 있어, 재조회 대신 복구 호출의 반환값을 그대로 쓴다).
      */
-    @Transactional(readOnly = true) public ChatRoomResponse get(Long memberId, MemberRole role, Long reservationId) {
+    @Transactional(readOnly = true) public ChatRoomResponse getChatRoom(Long memberId, MemberRole role, Long reservationId) {
         if (role != MemberRole.MEMBER) throw new CustomException(CommonErrorCode.ACCESS_DENIED);
         ReservationChatAccessReader.ChatAccess chatAccess = access.read(reservationId, memberId);
         if (chatAccess == null || !chatAccess.isActive()) throw new CustomException(CommonErrorCode.ACCESS_DENIED);

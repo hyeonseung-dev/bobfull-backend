@@ -40,7 +40,7 @@ class ChatMessageQueryServiceTest {
         given(names.readNames(any())).willReturn(Map.of(1L, "회원"));
 
         // when
-        ChatMessageSliceResponse result = service.get(7L, MemberRole.MEMBER, 1L, null, 2);
+        ChatMessageSliceResponse result = service.getMessageSlice(7L, MemberRole.MEMBER, 1L, null, 2);
 
         // then
         assertThat(result.content()).extracting("messageId").containsExactly(105L, 104L);
@@ -60,7 +60,7 @@ class ChatMessageQueryServiceTest {
         given(names.readNames(any())).willReturn(Map.of(1L, "회원"));
 
         // when
-        ChatMessageSliceResponse result = service.get(7L, MemberRole.MEMBER, 1L, 104L, 2);
+        ChatMessageSliceResponse result = service.getMessageSlice(7L, MemberRole.MEMBER, 1L, 104L, 2);
 
         // then
         assertThat(result.content()).extracting("messageId").containsExactly(103L);

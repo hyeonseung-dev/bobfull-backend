@@ -68,6 +68,6 @@ class RestaurantFeedbackInsightServiceProviderMissingTest {
                 messages, rooms, reservations, timeSlots, tables, restaurants,
                 insights, candidateGate, privacyValidator, provider, clock, "v1", writer);
 
-        assertThatThrownBy(() -> service.analyze(1L)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> service.analyzeMessage(1L)).isInstanceOf(IllegalStateException.class);
     }
 }

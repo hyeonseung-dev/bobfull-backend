@@ -48,10 +48,10 @@ public class PaymentCompletionService {
         if (payment.getStatus() != PaymentStatus.READY && payment.getStatus() != PaymentStatus.EXPIRED) {
             throw new CustomException(PaymentErrorCode.PAYMENT_VERIFICATION_FAILED);
         }
-        PortOnePaymentReader.PortOnePayment external = portOnePaymentReader.read(paymentId);
-        if (!paymentId.equals(external.paymentId()) || !external.paid() || external.amount() == null
-                || payment.getAmount().compareTo(external.amount()) != 0
-                || !Payment.CURRENCY_KRW.equals(external.currency()) || !payment.getCurrency().equals(external.currency())) {
+        PortOnePaymentReader.PortOnePayment portOnePayment = portOnePaymentReader.read(paymentId);
+        if (!paymentId.equals(portOnePayment.paymentId()) || !portOnePayment.paid() || portOnePayment.amount() == null
+                || payment.getAmount().compareTo(portOnePayment.amount()) != 0
+                || !Payment.CURRENCY_KRW.equals(portOnePayment.currency()) || !payment.getCurrency().equals(portOnePayment.currency())) {
             log.warn("event=PAYMENT_VERIFICATION_INCONCLUSIVE paymentId={} reason=PORTONE_PAYMENT_MISMATCH",
                     paymentId);
             throw new CustomException(PaymentErrorCode.PAYMENT_VERIFICATION_FAILED);
@@ -64,10 +64,10 @@ public class PaymentCompletionService {
         if (payment.getStatus() != PaymentStatus.READY && payment.getStatus() != PaymentStatus.EXPIRED) {
             throw new CustomException(PaymentErrorCode.PAYMENT_VERIFICATION_FAILED);
         }
-        PortOnePaymentReader.PortOnePayment external = portOnePaymentReader.read(paymentId);
-        if (!paymentId.equals(external.paymentId()) || !external.paid() || external.amount() == null
-                || payment.getAmount().compareTo(external.amount()) != 0
-                || !Payment.CURRENCY_KRW.equals(external.currency()) || !payment.getCurrency().equals(external.currency())) {
+        PortOnePaymentReader.PortOnePayment portOnePayment = portOnePaymentReader.read(paymentId);
+        if (!paymentId.equals(portOnePayment.paymentId()) || !portOnePayment.paid() || portOnePayment.amount() == null
+                || payment.getAmount().compareTo(portOnePayment.amount()) != 0
+                || !Payment.CURRENCY_KRW.equals(portOnePayment.currency()) || !payment.getCurrency().equals(portOnePayment.currency())) {
             log.warn("event=PAYMENT_VERIFICATION_INCONCLUSIVE paymentId={} reason=PORTONE_PAYMENT_MISMATCH",
                     paymentId);
             throw new CustomException(PaymentErrorCode.PAYMENT_VERIFICATION_FAILED);
