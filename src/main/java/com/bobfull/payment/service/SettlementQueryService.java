@@ -36,7 +36,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/** OWNER 식당의 Payment·Refund 이력으로 지급 예정 금액을 조회 계산한다. */
 @Service
 public class SettlementQueryService {
 

@@ -7,7 +7,6 @@ import io.portone.sdk.server.payment.Payment;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 
-/** PortOne SDK 타입을 결제 도메인 내부 모델로 변환한다. */
 @Component
 public class PortOneSdkPaymentReader implements PortOnePaymentReader {
     private final PortOneClient portOneClient;
