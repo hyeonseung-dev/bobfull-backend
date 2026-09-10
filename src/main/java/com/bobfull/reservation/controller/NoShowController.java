@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** OWNER의 예약별 노쇼 처리 대상 조회·처리·해제·이력 조회를 담당한다(Issue #48 §9-1~9-4). */
 @RestController
 @RequestMapping("/api/owner/reservations/{reservationId}")
 public class NoShowController {

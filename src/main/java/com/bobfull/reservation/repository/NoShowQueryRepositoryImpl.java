@@ -24,7 +24,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-/** §9-4·§9-5 노쇼 이력·집계 조회를 담당한다(Issue #48). */
 @Repository
 public class NoShowQueryRepositoryImpl implements NoShowQueryRepository {
 
