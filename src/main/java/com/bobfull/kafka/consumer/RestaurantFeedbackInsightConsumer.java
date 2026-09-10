@@ -15,6 +15,6 @@ public class RestaurantFeedbackInsightConsumer {
     @KafkaListener(topics = "${bobfull.kafka.chat-message.topic:bobfull.chat.message-created.v1}", groupId = "${bobfull.kafka.restaurant-insight.group-id:bobfull-restaurant-insight-staging}", containerFactory = "restaurantInsightKafkaListenerContainerFactory", concurrency = "${bobfull.kafka.restaurant-insight.consumer-concurrency:1}")
     public void onChatMessageCreated(ChatMessageCreatedEvent event) {
         if (event.eventVersion() != 1) throw new InvalidChatMessageEventException("Unsupported eventVersion=" + event.eventVersion());
-        service.analyze(event.messageId());
+        service.analyzeMessage(event.messageId());
     }
 }

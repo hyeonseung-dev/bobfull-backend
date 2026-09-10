@@ -34,7 +34,7 @@ class ChatQueryControllerTest {
     @Test
     void 인증된_MEMBER는_예약_채팅방을_공통_응답으로_조회한다() throws Exception {
         // given
-        given(chatRoomQueryService.get(1L, MemberRole.MEMBER, 10L)).willReturn(new ChatRoomResponse(3L, 10L));
+        given(chatRoomQueryService.getChatRoom(1L, MemberRole.MEMBER, 10L)).willReturn(new ChatRoomResponse(3L, 10L));
 
         // when & then
         mockMvc.perform(get("/api/reservations/10/chat-room").with(authentication(memberAuthentication())))
@@ -45,7 +45,7 @@ class ChatQueryControllerTest {
     @Test
     void 인증된_MEMBER는_기본_size_50으로_메시지를_조회한다() throws Exception {
         // given
-        given(chatMessageQueryService.get(1L, MemberRole.MEMBER, 3L, null, 50))
+        given(chatMessageQueryService.getMessageSlice(1L, MemberRole.MEMBER, 3L, null, 50))
                 .willReturn(new ChatMessageSliceResponse(List.of(), null));
 
         // when & then
@@ -64,9 +64,9 @@ class ChatQueryControllerTest {
 
     @Test
     void size_1과_100은_허용한다() throws Exception {
-        given(chatMessageQueryService.get(1L, MemberRole.MEMBER, 3L, null, 1))
+        given(chatMessageQueryService.getMessageSlice(1L, MemberRole.MEMBER, 3L, null, 1))
                 .willReturn(new ChatMessageSliceResponse(List.of(), null));
-        given(chatMessageQueryService.get(1L, MemberRole.MEMBER, 3L, null, 100))
+        given(chatMessageQueryService.getMessageSlice(1L, MemberRole.MEMBER, 3L, null, 100))
                 .willReturn(new ChatMessageSliceResponse(List.of(), null));
 
         mockMvc.perform(get("/api/chat/rooms/3/messages?size=1").with(authentication(memberAuthentication())))
@@ -77,7 +77,7 @@ class ChatQueryControllerTest {
 
     @Test
     void 비참여자와_취소된_참여자는_403_ACCESS_DENIED를_반환한다() throws Exception {
-        given(chatRoomQueryService.get(1L, MemberRole.MEMBER, 10L))
+        given(chatRoomQueryService.getChatRoom(1L, MemberRole.MEMBER, 10L))
                 .willThrow(new CustomException(CommonErrorCode.ACCESS_DENIED));
         mockMvc.perform(get("/api/reservations/10/chat-room").with(authentication(memberAuthentication())))
                 .andExpect(status().isForbidden()).andExpect(jsonPath("$.code", is("ACCESS_DENIED")));
@@ -85,7 +85,7 @@ class ChatQueryControllerTest {
 
     @Test
     void 권한은_있지만_채팅방이_없으면_404를_반환한다() throws Exception {
-        given(chatRoomQueryService.get(1L, MemberRole.MEMBER, 10L))
+        given(chatRoomQueryService.getChatRoom(1L, MemberRole.MEMBER, 10L))
                 .willThrow(new CustomException(ChatErrorCode.CHAT_ROOM_ID_NOT_FOUND));
         mockMvc.perform(get("/api/reservations/10/chat-room").with(authentication(memberAuthentication())))
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.code", is("CHAT_ROOM_ID_NOT_FOUND")));

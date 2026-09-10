@@ -43,7 +43,7 @@ public class RestaurantFeedbackInsightService {
         this.messages=messages; this.rooms=rooms; this.reservations=reservations; this.timeSlots=timeSlots; this.tables=tables; this.restaurants=restaurants; this.insights=insights; this.candidateGate=candidateGate; this.privacyValidator=privacyValidator; this.provider=provider; this.clock=clock; this.activePromptVersion=activePromptVersion; this.writer=writer;
     }
     @Transactional
-    public void analyze(Long messageId) {
+    public void analyzeMessage(Long messageId) {
         if (insights.findByMessageIdAndPromptVersion(messageId, activePromptVersion).isPresent()) return;
         ChatMessage message = messages.findById(messageId).orElseThrow(() -> new CustomException(ChatErrorCode.CHAT_MESSAGE_ID_NOT_FOUND));
         Long restaurantId = resolveRestaurantId(message.getChatRoomId());
