@@ -15,7 +15,7 @@ import com.bobfull.common.monitoring.BusinessMetricRecorder;
 import com.bobfull.common.security.SecurityConfig;
 import com.bobfull.payment.port.PortOneWebhookVerifier;
 import com.bobfull.payment.service.PaymentCompletionService;
-import com.bobfull.payment.service.RefundWebhookService;
+import com.bobfull.payment.refund.service.RefundWebhookService;
 import com.bobfull.auth.token.AccessTokenBlacklistStore;
 import io.portone.sdk.server.errors.WebhookVerificationException;
 import io.portone.sdk.server.webhook.WebhookVerifier;

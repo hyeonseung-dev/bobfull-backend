@@ -13,7 +13,7 @@ import com.bobfull.restaurant.sharedtable.repository.SharedTableRepository;
 import com.bobfull.restaurant.timeslot.entity.TimeSlot;
 import com.bobfull.restaurant.timeslot.repository.TimeSlotRepository;
 import com.bobfull.restaurant.timeslot.service.TimeSlotService;
-import com.bobfull.payment.service.SettlementQueryService;
+import com.bobfull.payment.settlement.service.SettlementQueryService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;

@@ -1,9 +1,10 @@
-package com.bobfull.admin.service;
+package com.bobfull.payment.refund.service;
 
-import com.bobfull.admin.dto.AdminRefundListItemResponse;
 import com.bobfull.common.exception.CommonErrorCode;
 import com.bobfull.common.exception.CustomException;
+import com.bobfull.common.exception.PaymentErrorCode;
 import com.bobfull.common.response.PageResponse;
+import com.bobfull.payment.refund.dto.RefundResponse;
 import com.bobfull.payment.refund.entity.Refund;
 import com.bobfull.payment.refund.entity.RefundStatus;
 import com.bobfull.payment.refund.repository.RefundRepository;
@@ -15,24 +16,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class AdminRefundQueryService {
-
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id"));
+public class RefundQueryService {
 
     private final RefundRepository refundRepository;
 
-    public AdminRefundQueryService(RefundRepository refundRepository) {
+    public RefundQueryService(RefundRepository refundRepository) {
         this.refundRepository = refundRepository;
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AdminRefundListItemResponse> getRefunds(String refundStatus, Pageable pageable) {
+    public PageResponse<RefundResponse> getMyRefunds(Long memberId, String refundStatus, Pageable pageable) {
+        Pageable orderedPageable = ordered(pageable);
         RefundStatus status = parseStatus(refundStatus);
-        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT_SORT);
         Page<Refund> refunds = status == null
-                ? refundRepository.findAll(sortedPageable)
-                : refundRepository.findAllByStatus(status, sortedPageable);
-        return PageResponse.from(refunds.map(AdminRefundListItemResponse::from));
+                ? refundRepository.findAllByPayment_MemberId(memberId, orderedPageable)
+                : refundRepository.findAllByPayment_MemberIdAndStatus(memberId, status, orderedPageable);
+        return PageResponse.from(refunds.map(RefundResponse::from));
+    }
+
+    @Transactional(readOnly = true)
+    public RefundResponse getMyRefund(Long memberId, Long refundId) {
+        Refund refund = refundRepository.findByIdAndPayment_MemberId(refundId, memberId)
+                .orElseThrow(() -> new CustomException(PaymentErrorCode.REFUND_ID_NOT_FOUND));
+        return RefundResponse.from(refund);
     }
 
     private RefundStatus parseStatus(String refundStatus) {
@@ -44,5 +50,10 @@ public class AdminRefundQueryService {
         } catch (IllegalArgumentException exception) {
             throw new CustomException(CommonErrorCode.INVALID_INPUT_VALUE);
         }
+    }
+
+    private Pageable ordered(Pageable pageable) {
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id")));
     }
 }

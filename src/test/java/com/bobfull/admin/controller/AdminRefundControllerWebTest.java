@@ -16,7 +16,7 @@ import com.bobfull.common.response.PageResponse;
 import com.bobfull.common.security.AuthMember;
 import com.bobfull.common.security.MemberRole;
 import com.bobfull.common.security.SecurityConfig;
-import com.bobfull.payment.entity.RefundStatus;
+import com.bobfull.payment.refund.entity.RefundStatus;
 import com.bobfull.auth.token.AccessTokenBlacklistStore;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
