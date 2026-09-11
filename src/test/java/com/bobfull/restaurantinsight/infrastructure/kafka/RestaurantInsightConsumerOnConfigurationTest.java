@@ -1,4 +1,4 @@
-package com.bobfull.kafka.consumer;
+package com.bobfull.restaurantinsight.infrastructure.kafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

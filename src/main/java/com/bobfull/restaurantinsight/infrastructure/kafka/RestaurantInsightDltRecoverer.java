@@ -1,4 +1,4 @@
-package com.bobfull.kafka.consumer;
+package com.bobfull.restaurantinsight.infrastructure.kafka;
 
 import com.bobfull.common.monitoring.BusinessMetricEvent;
 import com.bobfull.common.monitoring.BusinessMetricRecorder;
