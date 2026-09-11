@@ -3,10 +3,10 @@ package com.bobfull.reservation.adapter;
 import com.bobfull.common.exception.CustomException;
 import com.bobfull.common.exception.ReservationErrorCode;
 import com.bobfull.reservation.port.ReservationCapacityReader;
-import com.bobfull.sharedtable.entity.SharedTable;
-import com.bobfull.sharedtable.repository.SharedTableRepository;
-import com.bobfull.timeslot.entity.TimeSlot;
-import com.bobfull.timeslot.repository.TimeSlotRepository;
+import com.bobfull.restaurant.sharedtable.entity.SharedTable;
+import com.bobfull.restaurant.sharedtable.repository.SharedTableRepository;
+import com.bobfull.restaurant.timeslot.entity.TimeSlot;
+import com.bobfull.restaurant.timeslot.repository.TimeSlotRepository;
 import java.time.Instant;
 import org.springframework.stereotype.Component;
 

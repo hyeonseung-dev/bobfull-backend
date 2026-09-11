@@ -2,7 +2,7 @@ package com.bobfull.reservation.adapter;
 
 import com.bobfull.reservation.entity.ReservationStatus;
 import com.bobfull.reservation.repository.ReservationRepository;
-import com.bobfull.timeslot.port.TimeSlotReservationUsagePort;
+import com.bobfull.restaurant.timeslot.port.TimeSlotReservationUsagePort;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

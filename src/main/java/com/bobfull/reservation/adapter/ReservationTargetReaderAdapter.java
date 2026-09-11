@@ -5,10 +5,10 @@ import com.bobfull.common.exception.ReservationErrorCode;
 import com.bobfull.reservation.port.ReservationTargetReader;
 import com.bobfull.restaurant.entity.Restaurant;
 import com.bobfull.restaurant.repository.RestaurantRepository;
-import com.bobfull.sharedtable.entity.SharedTable;
-import com.bobfull.sharedtable.repository.SharedTableRepository;
-import com.bobfull.timeslot.entity.TimeSlot;
-import com.bobfull.timeslot.repository.TimeSlotRepository;
+import com.bobfull.restaurant.sharedtable.entity.SharedTable;
+import com.bobfull.restaurant.sharedtable.repository.SharedTableRepository;
+import com.bobfull.restaurant.timeslot.entity.TimeSlot;
+import com.bobfull.restaurant.timeslot.repository.TimeSlotRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 

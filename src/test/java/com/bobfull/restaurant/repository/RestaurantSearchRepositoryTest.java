@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bobfull.restaurant.dto.RestaurantSearchRequest;
 import com.bobfull.restaurant.entity.Restaurant;
-import com.bobfull.sharedtable.entity.SharedTable;
-import com.bobfull.sharedtable.repository.SharedTableRepository;
-import com.bobfull.timeslot.entity.TimeSlot;
-import com.bobfull.timeslot.repository.TimeSlotRepository;
+import com.bobfull.restaurant.sharedtable.entity.SharedTable;
+import com.bobfull.restaurant.sharedtable.repository.SharedTableRepository;
+import com.bobfull.restaurant.timeslot.entity.TimeSlot;
+import com.bobfull.restaurant.timeslot.repository.TimeSlotRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
