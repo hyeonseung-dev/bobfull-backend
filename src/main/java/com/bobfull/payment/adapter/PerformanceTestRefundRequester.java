@@ -1,6 +1,7 @@
 package com.bobfull.payment.adapter;
 
 import com.bobfull.payment.port.PortOneRefundRequester;
+import com.bobfull.payment.infrastructure.portone.PortOneRefundGatewayAdapter;
 import com.bobfull.payment.service.RefundReconciliationScheduler;
 import java.io.IOException;
 import java.math.BigDecimal;

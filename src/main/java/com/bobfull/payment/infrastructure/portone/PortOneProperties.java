@@ -1,4 +1,4 @@
-package com.bobfull.payment.config;
+package com.bobfull.payment.infrastructure.portone;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;

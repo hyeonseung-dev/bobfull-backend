@@ -1,11 +1,10 @@
-package com.bobfull.payment.adapter;
+package com.bobfull.payment.infrastructure.portone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.bobfull.payment.port.PortOneRefundRequester.ReconciliationStatus;
 import com.bobfull.payment.port.PortOneRefundRequester;
-import com.bobfull.payment.config.PortOneProperties;
 import io.portone.sdk.server.PortOneClient;
 import io.portone.sdk.server.payment.CancelledPayment;
 import io.portone.sdk.server.payment.PaidPayment;

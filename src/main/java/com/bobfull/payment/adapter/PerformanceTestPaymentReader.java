@@ -3,6 +3,7 @@ package com.bobfull.payment.adapter;
 import com.bobfull.common.exception.CustomException;
 import com.bobfull.common.exception.PaymentErrorCode;
 import com.bobfull.payment.entity.Payment;
+import com.bobfull.payment.infrastructure.portone.PortOneSdkPaymentReader;
 import com.bobfull.payment.port.PortOnePaymentReader;
 import com.bobfull.payment.repository.PaymentRepository;
 import org.springframework.context.annotation.Primary;

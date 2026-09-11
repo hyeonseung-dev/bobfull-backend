@@ -1,4 +1,4 @@
-package com.bobfull.payment.adapter;
+package com.bobfull.payment.infrastructure.portone;
 import com.bobfull.payment.port.PortOneWebhookVerifier;
 import io.portone.sdk.server.webhook.*;
 import org.springframework.stereotype.Component;
