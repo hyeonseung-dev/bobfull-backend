@@ -1,4 +1,4 @@
-package com.bobfull.kafka.consumer;
+package com.bobfull.restaurantinsight.infrastructure.kafka;
 
 import com.bobfull.chat.dto.ChatMessageCreatedEvent;
 import com.bobfull.kafka.exception.InvalidChatMessageEventException;
