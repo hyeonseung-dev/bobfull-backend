@@ -29,7 +29,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
  * 1. 프로젝트 루트 {@code .env}에 실제 Gmail SMTP 정보(MAIL_HOST, MAIL_PORT, MAIL_USERNAME,
  *    MAIL_PASSWORD, MAIL_SMTP_AUTH, MAIL_SMTP_STARTTLS, NOTIFICATION_EMAIL_FROM_ADDRESS)를 채운다.
  * 2. 아래 {@code @Disabled} 줄을 잠시 지운 뒤, 확인하고 싶은 메서드 하나만(또는 클래스 전체를) 실행한다.
- *    예: ./gradlew :test --tests "com.bobfull.notification.adapter.ManualSmtpSendVerification"
+ *    예: ./gradlew :test --tests "com.bobfull.reservation.infrastructure.smtp.ManualSmtpSendVerification"
  * 3. 본인 Gmail 수신함에서 실제 도착을 직접 확인한 뒤, {@code @Disabled}를 다시 복원한다.
  */
 @Disabled("실제 Gmail 발송을 수동으로 확인할 때만 이 줄을 지우고 단독 실행한다")

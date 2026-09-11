@@ -10,7 +10,7 @@ import static org.mockito.BDDMockito.given;
 import com.bobfull.common.exception.CommonErrorCode;
 import com.bobfull.common.exception.CustomException;
 import com.bobfull.common.exception.ReservationErrorCode;
-import com.bobfull.outbox.service.EmailOutboxEventService;
+import com.bobfull.reservation.outbox.service.EmailOutboxEventService;
 import com.bobfull.reservation.dto.CancellationScope;
 import com.bobfull.reservation.dto.ReservationCancellationRequest;
 import com.bobfull.reservation.entity.ParticipationStatus;

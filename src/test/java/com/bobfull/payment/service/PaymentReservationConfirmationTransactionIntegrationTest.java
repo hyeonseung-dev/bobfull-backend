@@ -5,11 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bobfull.payment.entity.Payment;
 import com.bobfull.chat.repository.ChatRoomRepository;
-import com.bobfull.outbox.entity.OutboxEventStatus;
-import com.bobfull.outbox.entity.OutboxEventType;
-import com.bobfull.outbox.repository.OutboxEventRepository;
-import com.bobfull.outbox.repository.EmailOutboxDeliveryRepository;
-import com.bobfull.outbox.service.EmailOutboxEventService;
+import com.bobfull.infrastructure.outbox.entity.OutboxEventStatus;
+import com.bobfull.infrastructure.outbox.entity.OutboxEventType;
+import com.bobfull.infrastructure.outbox.repository.OutboxEventRepository;
+import com.bobfull.reservation.outbox.repository.EmailOutboxDeliveryRepository;
+import com.bobfull.reservation.outbox.service.EmailOutboxEventService;
 import com.bobfull.reservation.infrastructure.smtp.FakeReservationNotificationAdapter;
 import com.bobfull.payment.entity.PaymentPurpose;
 import com.bobfull.payment.entity.PaymentStatus;

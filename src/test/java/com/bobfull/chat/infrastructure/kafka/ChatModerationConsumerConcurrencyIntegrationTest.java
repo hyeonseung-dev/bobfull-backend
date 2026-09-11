@@ -15,7 +15,7 @@ import com.bobfull.chat.repository.ChatRoomRepository;
 import com.bobfull.chat.service.ChatMessageCommandService;
 import com.bobfull.common.security.AuthMember;
 import com.bobfull.common.security.MemberRole;
-import com.bobfull.outbox.service.ChatMessageOutboxProcessor;
+import com.bobfull.chat.outbox.service.ChatMessageOutboxProcessor;
 import com.bobfull.reservation.entity.ParticipationStatus;
 import com.bobfull.reservation.entity.ReservationStatus;
 import java.time.Duration;
