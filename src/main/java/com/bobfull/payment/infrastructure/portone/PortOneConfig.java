@@ -1,4 +1,4 @@
-package com.bobfull.payment.config;
+package com.bobfull.payment.infrastructure.portone;
 
 import io.portone.sdk.server.PortOneClient;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

@@ -1,4 +1,4 @@
-package com.bobfull.payment.adapter;
+package com.bobfull.payment.infrastructure.portone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

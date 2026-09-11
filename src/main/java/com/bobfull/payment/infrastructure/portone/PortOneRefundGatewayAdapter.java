@@ -1,11 +1,10 @@
-package com.bobfull.payment.adapter;
+package com.bobfull.payment.infrastructure.portone;
 
 import com.bobfull.payment.port.PortOneRefundRequester;
 import io.portone.sdk.server.PortOneClient;
 import io.portone.sdk.server.payment.PaymentCancellation;
 import io.portone.sdk.server.payment.PaidPayment;
 import io.portone.sdk.server.payment.CancelledPayment;
-import com.bobfull.payment.config.PortOneProperties;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;

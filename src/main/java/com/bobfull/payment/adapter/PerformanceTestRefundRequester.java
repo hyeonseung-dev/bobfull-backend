@@ -17,7 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * Issue #146 K6 성능 측정 전용 대체 구현이다. 실제 PortOne 환불 요청 API를 호출하지 않고,
  * K6 시나리오가 보낸 요청 헤더로 결과·지연을 제어해 즉시 응답 경로(시나리오 A/C/D/E/F)를
  * 외부 네트워크 없이 재현한다. {@code performance} 프로파일에서만 활성화되며, 다른
- * 프로파일에서는 {@link PortOneRefundGatewayAdapter}가 그대로 쓰인다.
+ * 프로파일에서는 {@link com.bobfull.payment.infrastructure.portone.PortOneRefundGatewayAdapter}가 그대로 쓰인다.
  *
  * <p>제어 헤더(모두 생략 가능, 생략 시 지연 없이 즉시 완료):</p>
  * <ul>

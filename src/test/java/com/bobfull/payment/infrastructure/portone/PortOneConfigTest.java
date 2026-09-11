@@ -1,4 +1,4 @@
-package com.bobfull.payment.config;
+package com.bobfull.payment.infrastructure.portone;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
