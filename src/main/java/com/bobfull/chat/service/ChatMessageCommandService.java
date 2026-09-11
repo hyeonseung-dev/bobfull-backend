@@ -1,6 +1,6 @@
 package com.bobfull.chat.service;
 import com.bobfull.chat.dto.ChatMessageSentResponse;
-import com.bobfull.chat.realtime.RedisChatMessagePublisher;
+import com.bobfull.chat.infrastructure.redis.RedisChatMessagePublisher;
 import com.bobfull.chat.entity.*;
 import com.bobfull.chat.port.*;
 import com.bobfull.chat.repository.*;
