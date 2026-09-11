@@ -1,4 +1,4 @@
-package com.bobfull.notification.adapter;
+package com.bobfull.reservation.infrastructure.smtp;
 
 import com.bobfull.reservation.port.ReservationNotificationPort;
 import jakarta.mail.MessagingException;

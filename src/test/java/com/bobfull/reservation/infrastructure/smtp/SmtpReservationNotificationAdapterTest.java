@@ -1,4 +1,4 @@
-package com.bobfull.notification.adapter;
+package com.bobfull.reservation.infrastructure.smtp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;

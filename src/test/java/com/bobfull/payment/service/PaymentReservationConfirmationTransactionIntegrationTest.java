@@ -10,7 +10,7 @@ import com.bobfull.outbox.entity.OutboxEventType;
 import com.bobfull.outbox.repository.OutboxEventRepository;
 import com.bobfull.outbox.repository.EmailOutboxDeliveryRepository;
 import com.bobfull.outbox.service.EmailOutboxEventService;
-import com.bobfull.notification.adapter.FakeReservationNotificationAdapter;
+import com.bobfull.reservation.infrastructure.smtp.FakeReservationNotificationAdapter;
 import com.bobfull.payment.entity.PaymentPurpose;
 import com.bobfull.payment.entity.PaymentStatus;
 import com.bobfull.payment.port.ReservationConfirmationPort;

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bobfull.member.entity.Member;
 import com.bobfull.member.repository.MemberRepository;
-import com.bobfull.notification.adapter.FakeReservationNotificationAdapter;
+import com.bobfull.reservation.infrastructure.smtp.FakeReservationNotificationAdapter;
 import com.bobfull.reservation.entity.Reservation;
 import com.bobfull.reservation.entity.ReservationParticipant;
 import com.bobfull.reservation.port.ReservationNotificationPort;
