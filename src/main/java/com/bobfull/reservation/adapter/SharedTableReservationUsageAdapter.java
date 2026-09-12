@@ -2,7 +2,7 @@ package com.bobfull.reservation.adapter;
 
 import com.bobfull.reservation.entity.ReservationStatus;
 import com.bobfull.reservation.repository.ReservationRepository;
-import com.bobfull.sharedtable.port.SharedTableReservationUsagePort;
+import com.bobfull.restaurant.sharedtable.port.SharedTableReservationUsagePort;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.stereotype.Component;

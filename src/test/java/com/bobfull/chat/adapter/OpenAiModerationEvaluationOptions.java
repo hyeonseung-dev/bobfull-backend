@@ -15,7 +15,7 @@ final class OpenAiModerationEvaluationOptions {
                     .maxCompletionTokens(maxOutputTokens)
                     .reasoningEffort("none");
         }
-        return ModerationOpenAiOptions.withMaxOutputTokens(maxOutputTokens);
+        return OpenAiChatOptions.builder().maxTokens(maxOutputTokens);
     }
 
     static String outputTokenOptionName(String model) {

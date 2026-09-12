@@ -1,6 +1,7 @@
 package com.bobfull.chat.adapter;
 
 import com.bobfull.chat.dto.AiModerationResponse;
+import com.bobfull.chat.infrastructure.ai.SpringAiModerationAdapter;
 import com.bobfull.chat.dto.ModerationResult;
 import com.bobfull.chat.entity.ChatMessage;
 import com.bobfull.chat.entity.ChatModeration;

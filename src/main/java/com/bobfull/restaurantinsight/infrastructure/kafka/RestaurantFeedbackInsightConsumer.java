@@ -1,7 +1,7 @@
 package com.bobfull.restaurantinsight.infrastructure.kafka;
 
 import com.bobfull.chat.dto.ChatMessageCreatedEvent;
-import com.bobfull.kafka.exception.InvalidChatMessageEventException;
+import com.bobfull.chat.exception.InvalidChatMessageEventException;
 import com.bobfull.restaurantinsight.service.RestaurantFeedbackInsightService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;

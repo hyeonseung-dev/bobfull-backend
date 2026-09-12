@@ -72,7 +72,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             + "and (:startAt is null or ts.startAt >= :startAt) and (:endAt is null or ts.startAt < :endAt)")
     List<Object[]> sumSettlementAmounts(
             @Param("restaurantId") Long restaurantId,
-            @Param("completedStatus") com.bobfull.payment.entity.RefundStatus completedStatus,
+            @Param("completedStatus") com.bobfull.payment.refund.entity.RefundStatus completedStatus,
             @Param("startAt") Instant startAt,
             @Param("endAt") Instant endAt
     );

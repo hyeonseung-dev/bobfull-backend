@@ -5,7 +5,7 @@ import com.bobfull.common.exception.PaymentErrorCode;
 import com.bobfull.common.monitoring.BusinessMetricEvent;
 import com.bobfull.common.monitoring.BusinessMetricRecorder;
 import com.bobfull.payment.service.PaymentCompletionService;
-import com.bobfull.payment.service.RefundWebhookService;
+import com.bobfull.payment.refund.service.RefundWebhookService;
 import io.portone.sdk.server.errors.WebhookVerificationException;
 import io.portone.sdk.server.webhook.WebhookVerifier;
 import com.bobfull.payment.port.PortOneWebhookVerifier;
