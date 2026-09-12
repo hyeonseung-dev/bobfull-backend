@@ -12,7 +12,7 @@ import com.bobfull.restaurant.sharedtable.entity.SharedTable;
 import com.bobfull.restaurant.sharedtable.repository.SharedTableRepository;
 import com.bobfull.restaurant.timeslot.entity.TimeSlot;
 import com.bobfull.restaurant.timeslot.repository.TimeSlotRepository;
-import com.bobfull.restaurant.timeslot.service.TimeSlotService;
+import com.bobfull.restaurant.timeslot.service.AvailableDiningSessionQueryService;
 import com.bobfull.payment.settlement.service.SettlementQueryService;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -36,7 +36,7 @@ import org.springframework.test.context.ContextConfiguration;
 @EnabledIfEnvironmentVariable(named = "BOBFULL_PERF_DB_URL", matches = ".+")
 class PerformanceQueryCountIntegrationTest {
 
-    @Autowired private TimeSlotService timeSlotService;
+    @Autowired private AvailableDiningSessionQueryService availableDiningSessionQueryService;
     @Autowired private SettlementQueryService settlementQueryService;
     @Autowired private jakarta.persistence.EntityManagerFactory entityManagerFactory;
     @Autowired private RestaurantRepository restaurantRepository;
@@ -70,7 +70,8 @@ class PerformanceQueryCountIntegrationTest {
     void 예약가능회차_조회_쿼리수를_기록한다() throws Exception {
         Statistics statistics = statistics();
         statistics.clear();
-        assertThat(timeSlotService.getAvailableDiningSessions(restaurantId, LocalDate.parse("2026-08-10"), null).content()).hasSize(2);
+        assertThat(availableDiningSessionQueryService
+                .getAvailableDiningSessions(restaurantId, LocalDate.parse("2026-08-10"), null).content()).hasSize(2);
         // Issue #235: 회차별 반복 조회 4종을 배치 쿼리로 묶어, TimeSlot 건수와 무관한 고정값(7)이
         // 됐다(외부 조회 3회 + 배치 조회 4회). 이전(Issue #61 이후, #235 이전)에는 3 + 2*4 = 11이었다.
         assertThat(statistics.getPrepareStatementCount()).isEqualTo(7);
