@@ -12,8 +12,11 @@ import com.bobfull.reservation.repository.ReservationRepository;
 import com.bobfull.restaurant.entity.Restaurant;
 import com.bobfull.restaurant.repository.RestaurantRepository;
 import com.bobfull.restaurantinsight.adapter.RestaurantFeedbackPrompt;
+import com.bobfull.restaurantinsight.dto.RestaurantFeedbackAnalysis;
 import com.bobfull.restaurantinsight.dto.RestaurantFeedbackInsightListResponse;
 import com.bobfull.restaurantinsight.dto.RestaurantFeedbackInsightResponse;
+import com.bobfull.restaurantinsight.entity.FeedbackAspectType;
+import com.bobfull.restaurantinsight.entity.FeedbackOpinionType;
 import com.bobfull.restaurantinsight.entity.RestaurantFeedbackAnalysisStatus;
 import com.bobfull.restaurantinsight.entity.RestaurantFeedbackInsight;
 import com.bobfull.restaurantinsight.port.RestaurantFeedbackInsightPort;
@@ -24,6 +27,8 @@ import com.bobfull.restaurant.timeslot.entity.TimeSlot;
 import com.bobfull.restaurant.timeslot.repository.TimeSlotRepository;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -49,6 +54,14 @@ public class RestaurantFeedbackInsightService {
         Long restaurantId = resolveRestaurantId(message.getChatRoomId());
         if (privacyValidator.containsSensitiveIdentifier(message.getContent())) { saveExcluded(messageId, restaurantId, RestaurantFeedbackAnalysisStatus.EXCLUDED_INPUT_PII); return; }
         if (!candidateGate.isCandidate(message.getContent())) { saveExcluded(messageId, restaurantId, RestaurantFeedbackAnalysisStatus.EXCLUDED_CANDIDATE); return; }
+        RestaurantFeedbackInsightPort.Result result = analyzeWithConfiguredProvider(message.getContent());
+        List<RestaurantFeedbackAnalysis.Item> validItems = extractValidItems(result);
+        RestaurantFeedbackInsight insight = createInsight(messageId, restaurantId, result, validItems);
+        addDistinctItems(insight, validItems);
+        saveIdempotently(messageId, insight);
+    }
+
+    private RestaurantFeedbackInsightPort.Result analyzeWithConfiguredProvider(String content) {
         RestaurantFeedbackInsightPort activeProvider = provider.getIfAvailable();
         if (activeProvider == null) {
             // consumer-enabled=false인 Production 기본값에서는 Consumer Bean 자체가 없어 이 메서드가 호출되지
@@ -57,43 +70,65 @@ public class RestaurantFeedbackInsightService {
             throw new IllegalStateException(
                     "Restaurant Insight consumer is enabled but no RestaurantFeedbackInsightPort bean is configured");
         }
-        RestaurantFeedbackInsightPort.Result result = activeProvider.analyze(message.getContent());
+        RestaurantFeedbackInsightPort.Result result = activeProvider.analyze(content);
         if (result.analysis() == null) throw new IllegalStateException("Insight structured output analysis is missing");
-        java.util.List<com.bobfull.restaurantinsight.dto.RestaurantFeedbackAnalysis.Item> rawItems = !result.analysis().relevant() || result.analysis().items() == null ? java.util.List.of() : result.analysis().items();
+        return result;
+    }
+
+    private List<RestaurantFeedbackAnalysis.Item> extractValidItems(RestaurantFeedbackInsightPort.Result result) {
+        List<RestaurantFeedbackAnalysis.Item> rawItems = !result.analysis().relevant() || result.analysis().items() == null
+                ? List.of()
+                : result.analysis().items();
         // LLM이 반환한 normalizedAspect는 저장 여부와 무관하게 항상 privacy 검증을 거친다(PII/재식별
         // 단서가 섞인 Item은 그 자체로 신뢰할 수 없는 결과로 보고 버린다). 저장 시에는 MENU aspectType과
         // ETC opinionType만 실제 대상 식별이 필요해(ETC는 "기타"라는 이름과 달리 의미가 enum만으로
         // 확정되지 않는 자유 범주) 검증된 LLM normalizedAspect를 그대로 쓰고, 나머지 opinionType(예:
         // FRIENDLINESS/PRICE_LEVEL/CLEANLINESS 등 의미가 opinionType만으로 이미 확정되는 경우)은
         // 아래에서 canonical 문구로 치환한다.
-        java.util.List<com.bobfull.restaurantinsight.dto.RestaurantFeedbackAnalysis.Item> validItems = rawItems.stream()
+        return rawItems.stream()
                 .filter(item -> item.category() != null && item.aspectType() != null && item.opinionType() != null && item.sentiment() != null && privacyValidator.isSafeAspect(item.normalizedAspect()))
                 .toList();
-        RestaurantFeedbackInsight insight = validItems.isEmpty() ? RestaurantFeedbackInsight.excluded(messageId, restaurantId, activePromptVersion, clock.instant(), RestaurantFeedbackAnalysisStatus.EXCLUDED_OUTPUT_VALIDATION) : RestaurantFeedbackInsight.completed(messageId, restaurantId, activePromptVersion, result.provider(), result.modelName(), clock.instant());
+    }
+
+    private RestaurantFeedbackInsight createInsight(
+            Long messageId,
+            Long restaurantId,
+            RestaurantFeedbackInsightPort.Result result,
+            List<RestaurantFeedbackAnalysis.Item> validItems
+    ) {
+        return validItems.isEmpty()
+                ? RestaurantFeedbackInsight.excluded(messageId, restaurantId, activePromptVersion, clock.instant(), RestaurantFeedbackAnalysisStatus.EXCLUDED_OUTPUT_VALIDATION)
+                : RestaurantFeedbackInsight.completed(messageId, restaurantId, activePromptVersion, result.provider(), result.modelName(), clock.instant());
+    }
+
+    private void addDistinctItems(RestaurantFeedbackInsight insight, List<RestaurantFeedbackAnalysis.Item> validItems) {
         // canonical 치환으로 한 메시지 안에서 두 Item이 동일한 5-field로 수렴할 수 있으므로(예: LLM이
         // 같은 opinionType을 두 번 반환), UNIQUE(analysis, 5-field) 위반을 막기 위해 저장 전 중복 제거한다.
-        java.util.LinkedHashSet<java.util.List<Object>> seenKeys = new java.util.LinkedHashSet<>();
+        LinkedHashSet<List<Object>> seenKeys = new LinkedHashSet<>();
         for (var item : validItems) {
             // aspectType==ETC는 이름과 달리 enum만으로 실제 대상을 특정할 수 없는 자유-target
             // 범주이므로 MENU와 동일하게 취급한다. 그렇지 않으면 opinionType만으로
             // canonicalize할 때 서로 다른 대상("국물"/"반찬"/"소스" 등)이 같은 opinionType
             // 하나로 잘못 병합될 수 있다(리뷰 지적: MAJOR).
-            boolean keepLlmAspect = item.aspectType() == com.bobfull.restaurantinsight.entity.FeedbackAspectType.MENU
-                    || item.aspectType() == com.bobfull.restaurantinsight.entity.FeedbackAspectType.ETC
-                    || item.opinionType() == com.bobfull.restaurantinsight.entity.FeedbackOpinionType.ETC;
+            boolean keepLlmAspect = item.aspectType() == FeedbackAspectType.MENU
+                    || item.aspectType() == FeedbackAspectType.ETC
+                    || item.opinionType() == FeedbackOpinionType.ETC;
             String normalizedAspect = keepLlmAspect
                     ? privacyValidator.normalizeSafeAspect(item.normalizedAspect())
                     : RestaurantInsightAspectCanonicalizer.canonicalAspectFor(item.opinionType());
-            var key = java.util.List.<Object>of(item.category(), item.aspectType(), normalizedAspect, item.opinionType(), item.sentiment());
+            var key = List.<Object>of(item.category(), item.aspectType(), normalizedAspect, item.opinionType(), item.sentiment());
             if (seenKeys.add(key)) insight.addItem(item.category(), item.aspectType(), normalizedAspect, item.opinionType(), item.sentiment());
         }
+    }
+
+    private void saveIdempotently(Long messageId, RestaurantFeedbackInsight insight) {
         // writer.save()는 REQUIRES_NEW로 별도 트랜잭션에서 실행되므로, 동시 경쟁으로 인한 UNIQUE 위반이
         // 이 메서드(및 호출자인 Kafka listener)의 트랜잭션을 rollback-only로 오염시키지 않는다.
         try { writer.save(insight); } catch (DataIntegrityViolationException exception) { if (insights.findByMessageIdAndPromptVersion(messageId, activePromptVersion).isEmpty()) throw exception; }
     }
     private void saveExcluded(Long messageId, Long restaurantId, RestaurantFeedbackAnalysisStatus status) {
-        try { writer.save(RestaurantFeedbackInsight.excluded(messageId, restaurantId, activePromptVersion, clock.instant(), status)); }
-        catch (DataIntegrityViolationException exception) { if (insights.findByMessageIdAndPromptVersion(messageId, activePromptVersion).isEmpty()) throw exception; }
+        saveIdempotently(messageId,
+                RestaurantFeedbackInsight.excluded(messageId, restaurantId, activePromptVersion, clock.instant(), status));
     }
     @Transactional(readOnly = true)
     public RestaurantFeedbackInsightListResponse getOwnerInsights(Long ownerId, Long restaurantId) {
