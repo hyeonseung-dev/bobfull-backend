@@ -88,10 +88,18 @@ class TimeSlotServiceTest {
                 sharedTableRepository,
                 restaurantRepository,
                 timeSlotReservationValidator,
+                FIXED_CLOCK
+        );
+    }
+
+    private AvailableDiningSessionQueryService availableDiningSessionQueryService() {
+        return new AvailableDiningSessionQueryService(
+                timeSlotRepository,
+                sharedTableRepository,
+                restaurantRepository,
                 reservationRepository,
                 reservationParticipantRepository,
-                paymentHoldReader,
-                FIXED_CLOCK
+                paymentHoldReader
         );
     }
 
@@ -302,7 +310,7 @@ class TimeSlotServiceTest {
         given(paymentHoldReader.sumActiveReadyPartySizeByTimeSlotIds(anyCollection())).willReturn(Map.of());
 
         // when
-        AvailableDiningSessionListResponse response = timeSlotService()
+        AvailableDiningSessionListResponse response = availableDiningSessionQueryService()
                 .getAvailableDiningSessions(10L, LocalDate.of(2026, 8, 1), 3);
 
         // then
@@ -311,6 +319,32 @@ class TimeSlotServiceTest {
         assertThat(response.content().get(0).availableCapacity()).isEqualTo(4);
         assertThat(response.content().get(0).reservationId()).isNull();
         assertThat(response.content().get(0).currentParticipantCount()).isEqualTo(0);
+    }
+
+    @Test
+    void 사용자용_예약_가능_회차는_Repository의_시작시각_오름차순을_응답에_유지한다() {
+        // given
+        Restaurant restaurant = restaurantOwnedBy(1L);
+        SharedTable table = sharedTable(100L, 10L, 4);
+        TimeSlot earlySlot = timeSlot(200L, 100L, "2026-08-01T11:00:00", "2026-08-01T13:00:00");
+        TimeSlot laterSlot = timeSlot(201L, 100L, "2026-08-01T13:00:00", "2026-08-01T15:00:00");
+        given(restaurantRepository.findByIdAndDeletedAtIsNull(10L)).willReturn(Optional.of(restaurant));
+        given(sharedTableRepository.findAllByRestaurantIdAndDeletedAtIsNull(10L)).willReturn(List.of(table));
+        given(timeSlotRepository
+                .findAllBySharedTableIdInAndStartAtGreaterThanEqualAndStartAtLessThanAndDeletedAtIsNullOrderByStartAtAsc(
+                        anyCollection(), any(Instant.class), any(Instant.class)))
+                .willReturn(List.of(earlySlot, laterSlot));
+        given(reservationRepository.findAllByTimeSlotIdInAndReservationStatusIn(anyCollection(), anyCollection()))
+                .willReturn(List.of());
+        given(paymentHoldReader.sumActiveReadyPartySizeByTimeSlotIds(anyCollection())).willReturn(Map.of());
+
+        // when
+        AvailableDiningSessionListResponse response = availableDiningSessionQueryService()
+                .getAvailableDiningSessions(10L, LocalDate.of(2026, 8, 1), null);
+
+        // then
+        assertThat(response.content()).extracting(AvailableDiningSessionResponse::sessionId)
+                .containsExactly(200L, 201L);
     }
 
     /**
@@ -351,7 +385,7 @@ class TimeSlotServiceTest {
                 .willReturn(Map.of(200L, 1));
 
         // when
-        AvailableDiningSessionListResponse response = timeSlotService()
+        AvailableDiningSessionListResponse response = availableDiningSessionQueryService()
                 .getAvailableDiningSessions(10L, LocalDate.of(2026, 8, 1), null);
 
         // then — 정원 4명인 occupiedSlot: 참여자 3 + READY 선점 1을 뺀 0석

@@ -10,6 +10,7 @@ import com.bobfull.restaurant.timeslot.dto.DiningSessionIdResponse;
 import com.bobfull.restaurant.timeslot.dto.DiningSessionRequest;
 import com.bobfull.restaurant.timeslot.dto.DiningSessionResponse;
 import com.bobfull.restaurant.timeslot.service.TimeSlotService;
+import com.bobfull.restaurant.timeslot.service.AvailableDiningSessionQueryService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import org.springframework.data.domain.Pageable;
@@ -32,9 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class DiningSessionController {
 
     private final TimeSlotService timeSlotService;
+    private final AvailableDiningSessionQueryService availableDiningSessionQueryService;
 
-    public DiningSessionController(TimeSlotService timeSlotService) {
+    public DiningSessionController(
+            TimeSlotService timeSlotService,
+            AvailableDiningSessionQueryService availableDiningSessionQueryService
+    ) {
         this.timeSlotService = timeSlotService;
+        this.availableDiningSessionQueryService = availableDiningSessionQueryService;
     }
 
     @PostMapping("/owner/tables/{tableId}/dining-sessions")
@@ -74,7 +80,7 @@ public class DiningSessionController {
             @RequestParam LocalDate date,
             @RequestParam(required = false) Integer partySize
     ) {
-        return ApiResponse.success(timeSlotService.getAvailableDiningSessions(restaurantId, date, partySize));
+        return ApiResponse.success(availableDiningSessionQueryService.getAvailableDiningSessions(restaurantId, date, partySize));
     }
 
     @PatchMapping("/owner/dining-sessions/{sessionId}")

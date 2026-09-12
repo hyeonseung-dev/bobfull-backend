@@ -66,7 +66,7 @@ class AvailableDiningSessionQueryCountInvestigationTest {
 
     private static final int TIME_SLOT_COUNT = 20;
 
-    @Autowired private TimeSlotService timeSlotService;
+    @Autowired private AvailableDiningSessionQueryService availableDiningSessionQueryService;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private ReservationParticipantRepository participantRepository;
     @Autowired private TimeSlotRepository timeSlotRepository;
@@ -108,7 +108,7 @@ class AvailableDiningSessionQueryCountInvestigationTest {
         Statistics statistics = statistics();
         statistics.clear();
 
-        AvailableDiningSessionListResponse response = timeSlotService.getAvailableDiningSessions(
+        AvailableDiningSessionListResponse response = availableDiningSessionQueryService.getAvailableDiningSessions(
                 restaurant.getId(), targetDate, null);
 
         long queryCount = statistics.getPrepareStatementCount();

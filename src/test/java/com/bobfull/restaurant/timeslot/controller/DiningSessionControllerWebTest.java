@@ -27,6 +27,7 @@ import com.bobfull.restaurant.timeslot.dto.DiningSessionIdResponse;
 import com.bobfull.restaurant.timeslot.dto.DiningSessionRequest;
 import com.bobfull.restaurant.timeslot.dto.DiningSessionResponse;
 import com.bobfull.restaurant.timeslot.service.TimeSlotService;
+import com.bobfull.restaurant.timeslot.service.AvailableDiningSessionQueryService;
 import com.bobfull.auth.token.AccessTokenBlacklistStore;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -65,6 +66,9 @@ class DiningSessionControllerWebTest {
 
     @MockitoBean
     private TimeSlotService timeSlotService;
+
+    @MockitoBean
+    private AvailableDiningSessionQueryService availableDiningSessionQueryService;
 
     private Authentication ownerAuthentication(Long memberId) {
         AuthMember authMember = new AuthMember(memberId, MemberRole.OWNER);
@@ -223,7 +227,7 @@ class DiningSessionControllerWebTest {
                 null,
                 0
         );
-        given(timeSlotService.getAvailableDiningSessions(10L, LocalDate.of(2026, 8, 1), 2))
+        given(availableDiningSessionQueryService.getAvailableDiningSessions(10L, LocalDate.of(2026, 8, 1), 2))
                 .willReturn(new AvailableDiningSessionListResponse(10L, List.of(item)));
 
         // when
