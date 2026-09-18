@@ -73,6 +73,7 @@ class ModerationPromptOptimizationProviderEvaluationTest {
             for (ModerationPromptCandidates.Candidate candidate : candidates) {
                 Metrics metrics = evaluate(candidate, corpus);
                 metrics.print(candidate.id(), run, configuredModel);
+                assertThat(metrics.providerFailures).as("Provider 호출 실패").isZero();
             }
         }
     }
