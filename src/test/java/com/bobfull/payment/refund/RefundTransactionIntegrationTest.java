@@ -21,10 +21,12 @@ import com.bobfull.reservation.entity.ParticipationStatus;
 import com.bobfull.reservation.entity.ReservationStatus;
 import com.bobfull.reservation.repository.ReservationParticipantRepository;
 import com.bobfull.reservation.repository.ReservationRepository;
+import com.bobfull.reservation.service.ReservationCompletionTestHook;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +43,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Propagation;
@@ -60,15 +63,17 @@ class RefundTransactionIntegrationTest {
     @Autowired private SequencedRequester requester;
     @Autowired private RefundTransactionService transactionService;
     @Autowired private RefundCompletionService refundCompletionService;
+    @Autowired private RefundReconciliationProcessor reconciliationProcessor;
     @Autowired private RefundWebhookService refundWebhookService;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private ReservationParticipantRepository reservationParticipantRepository;
     @Autowired private DelayedCompletionProbe delayedCompletionProbe;
+    @Autowired private FailOnceReservationCompletionHook completionHook;
     @MockitoSpyBean private RefundIdempotencyKeyGenerator keyGenerator;
     private Reservation activeReservation;
     private final Map<Long, Long> participantIds = new ConcurrentHashMap<>();
 
-    @AfterEach void clean() { requester.reset(); refundRepository.deleteAll(); paymentRepository.deleteAll(); reservationParticipantRepository.deleteAll(); reservationRepository.deleteAll(); activeReservation = null; participantIds.clear(); }
+    @AfterEach void clean() { requester.reset(); completionHook.reset(); refundRepository.deleteAll(); paymentRepository.deleteAll(); reservationParticipantRepository.deleteAll(); reservationRepository.deleteAll(); activeReservation = null; participantIds.clear(); }
 
     @Test
     void 앞선_외부_환불_성공은_뒤_실패와_예약트랜잭션_롤백_후에도_보존된다() {
@@ -468,6 +473,42 @@ class RefundTransactionIntegrationTest {
         assertThat(requester.calls()).isEqualTo(1);
     }
 
+    @Test
+    void 외부환불성공후_내부완료반영에_실패한_REQUESTED_Refund를_재조정하면_최종상태가_수렴한다() {
+        Payment payment = paid(1L);
+        completionHook.failNextCompletion();
+
+        assertThatThrownBy(() -> adapter.requestRefunds(
+                new RefundRequestCommand(activeReservation.getId(), List.of(participantIds.get(1L)), 1L, "test")))
+                .isInstanceOf(CustomException.class)
+                .extracting(exception -> ((CustomException) exception).getErrorCode())
+                .isEqualTo(PaymentErrorCode.REFUND_RECONCILIATION_REQUIRED);
+
+        Refund requested = refundRepository.findByPayment_Id(payment.getId()).orElseThrow();
+        assertThat(requested.getStatus()).isEqualTo(RefundStatus.REQUESTED);
+        assertThat(paymentRepository.findById(payment.getId()).orElseThrow().getStatus()).isEqualTo(PaymentStatus.PAID);
+        assertThat(reservationParticipantRepository.findById(participantIds.get(1L)).orElseThrow().getParticipationStatus())
+                .isEqualTo(ParticipationStatus.CANCEL_REQUESTED);
+        assertThat(reservationRepository.findById(activeReservation.getId()).orElseThrow().getReservationStatus())
+                .isEqualTo(ReservationStatus.CANCELLING);
+        assertThat(requester.calls()).isEqualTo(1);
+
+        List<Refund> reconciliationCandidates = refundRepository.findReconciliationCandidates(
+                List.of(RefundStatus.REQUESTED), Instant.now().minus(Duration.ofDays(1)),
+                Instant.now().plusSeconds(1), Instant.now().plusSeconds(1), PageRequest.of(0, 1));
+        assertThat(reconciliationCandidates).singleElement();
+        reconciliationProcessor.reconcile(reconciliationCandidates.get(0));
+
+        assertThat(refundRepository.findById(requested.getId()).orElseThrow().getStatus()).isEqualTo(RefundStatus.COMPLETED);
+        assertThat(paymentRepository.findById(payment.getId()).orElseThrow().getStatus()).isEqualTo(PaymentStatus.REFUNDED);
+        assertThat(reservationParticipantRepository.findById(participantIds.get(1L)).orElseThrow().getParticipationStatus())
+                .isEqualTo(ParticipationStatus.CANCELLED);
+        assertThat(reservationRepository.findById(activeReservation.getId()).orElseThrow().getReservationStatus())
+                .isEqualTo(ReservationStatus.CANCELLED);
+        assertThat(requester.reconciliationCalls()).isEqualTo(1);
+        assertThat(requester.calls()).isEqualTo(1);
+    }
+
     private Payment paid(Long participantId) {
         if (activeReservation == null) {
             activeReservation = reservationRepository.saveAndFlush(Reservation.create(1L, 1L));
@@ -486,6 +527,9 @@ class RefundTransactionIntegrationTest {
     @TestConfiguration(proxyBeanMethods = false)
     static class Config {
         @Bean @Primary SequencedRequester requester() { return new SequencedRequester(); }
+        @Bean FailOnceReservationCompletionHook failOnceReservationCompletionHook() {
+            return new FailOnceReservationCompletionHook();
+        }
         @Bean OuterRollbackProbe outerRollbackProbe(ReservationCancellationRefundAdapter adapter) { return new OuterRollbackProbe(adapter); }
         @Bean DelayedCompletionProbe delayedCompletionProbe(RefundRepository refundRepository) { return new DelayedCompletionProbe(refundRepository); }
     }
@@ -513,6 +557,7 @@ class RefundTransactionIntegrationTest {
     }
     static class SequencedRequester implements PortOneRefundRequester {
         private final AtomicInteger calls = new AtomicInteger();
+        private final AtomicInteger reconciliationCalls = new AtomicInteger();
         private volatile CountDownLatch firstCallEntered;
         private volatile CountDownLatch releaseFirstCall;
         private volatile boolean timeoutNext;
@@ -526,11 +571,29 @@ class RefundTransactionIntegrationTest {
             return new RefundResult("cancel-" + paymentId, true);
         }
         public boolean isCancellationCompleted(String paymentId, String cancellationId) { return true; }
+        @Override
+        public ReconciliationResult reconcile(String paymentId, String cancellationId, BigDecimal refundAmount,
+                                              Instant refundRequestedAt) {
+            reconciliationCalls.incrementAndGet();
+            return ReconciliationResult.completed("cancel-" + paymentId, Instant.now());
+        }
         void blockFirstCall() { firstCallEntered = new CountDownLatch(1); releaseFirstCall = new CountDownLatch(1); }
         int calls() { return calls.get(); }
+        int reconciliationCalls() { return reconciliationCalls.get(); }
         void timeoutNextCall() { timeoutNext = true; }
         void connectionResetNextCall() { connectionResetNext = true; }
-        void reset() { calls.set(0); firstCallEntered = null; releaseFirstCall = null; timeoutNext = false; connectionResetNext = false; }
+        void reset() { calls.set(0); reconciliationCalls.set(0); firstCallEntered = null; releaseFirstCall = null; timeoutNext = false; connectionResetNext = false; }
+    }
+    static class FailOnceReservationCompletionHook implements ReservationCompletionTestHook {
+        private boolean failNextCompletion;
+        void failNextCompletion() { failNextCompletion = true; }
+        void reset() { failNextCompletion = false; }
+        @Override public void beforeCompletion(Long reservationId) {
+            if (failNextCompletion) {
+                failNextCompletion = false;
+                throw new IllegalStateException("test forced reservation completion failure");
+            }
+        }
     }
     static class OuterRollbackProbe {
         private final ReservationCancellationRefundAdapter adapter;
