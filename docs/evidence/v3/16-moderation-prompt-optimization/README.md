@@ -14,6 +14,9 @@ Prompt Injection·fragment·정확도 Gate에서 모두 악화됐다. 이번 결
 - 동일 Structured Output schema와 `ModerationResultValidator`
 - corpus: 43개. #251 단일-message case 중 현재 `ModerationRuleFilter.clearFlagged`가 LLM으로 위임하는 case와
   `죽`, `010`, `시`, `간`, 공개 사업장 번호, 링크-only 정상 문장, `바보야`를 추가했다.
+- corpus는 원본 #251 dataset에서 파생하지만, size `43`과 SHA-256 fingerprint
+  `2e74ca9da5ce4d735d3bbfe45472d70a5564f8d1d25dcc265e8963f68602ce6e`로 Issue #16 당시 평가 입력을 고정한다.
+  원본 dataset 또는 Rule 변경으로 `id`, `type`, `input`, 기대 result/category/risk, injection 여부가 달라지면 corpus test가 실패한다.
 - 순서: 후보마다 corpus 선언 순서를 동일하게 유지했다.
 - latency는 외부 Provider 변동이 크므로 참고 지표다.
 
