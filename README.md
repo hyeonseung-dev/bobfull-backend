@@ -16,6 +16,24 @@ BobFull(밥풀)은 혼자 방문하기 부담스러운 식당에서 사용자가
 
 ---
 
+## 개인 Fork 고도화 범위
+
+이 README는 팀 프로젝트의 최종 결과와 수료 후 개인 작업을 같은 성과로 묶지 않습니다. 팀 프로젝트 당시의 구현·운영 결과는 원본 저장소에 보존하고, 이 Fork에서는 구조 개선과 추가 검증을 별도 날짜·근거로 기록합니다.
+
+| 구분 | 범위 | 대표 근거 |
+|---|---|---|
+| 팀 프로젝트 당시 결과 | 2026.08.24 발표 기준 기능, 팀 역할, 배포·운영 결과 | [원본 Backend](https://github.com/bobfull-project/bobfull-backend) · [팀 기술 문서](https://github.com/bobfull-project/bobfull-docs) |
+| 수료 후 개인 리팩토링 | 도메인·패키지 책임을 정리하고 ArchUnit으로 경계 회귀를 확인했다. SonarQube에서는 `RestaurantFeedbackInsightService.analyzeMessage()`의 `java:S3776`을 해소해 Cognitive Complexity `867 → 866`을 기록했으며, Bugs `14`, Vulnerabilities `0`, Duplicated lines `236`, Coverage `84.6%`는 유지했다. 가용 회차 조회는 20건 기준 PreparedStatement 7회를 유지했다. | [#9 유지보수성](https://github.com/hyeonseung-dev/bobfull-backend/issues/9) · [#10 ArchUnit](https://github.com/hyeonseung-dev/bobfull-backend/issues/10) · [#11 정적 분석](https://github.com/hyeonseung-dev/bobfull-backend/issues/11) |
+| 수료 후 추가 검증 | 결제·환불 실패 시나리오, Outbox 복구, AI Moderation 평가를 기존 구현과 구분해 검증했다. 이 결과는 프로젝트 당시 운영 실측으로 소급하지 않는다. | [#15 결제·환불](https://github.com/hyeonseung-dev/bobfull-backend/issues/15) · [#13 Outbox Evidence](./docs/evidence/v3/13-outbox-recovery/README.md) · [#16 AI Moderation Evidence](./docs/evidence/v3/16-moderation-prompt-optimization/README.md) |
+
+### 개인 기여와 팀 결과의 경계
+
+- 인기 회차 성능의 `83 → 7` 쿼리와 `p95 13.14s → 1.34s`는 팀 성과다. 개인 Fork에서는 해당 결과의 코드 review·Evidence 보강 기여만 설명하며, 개인 단독 구현·측정 성과로 쓰지 않는다. [기여 감사 #14](https://github.com/hyeonseung-dev/bobfull-backend/pull/41)
+- 다중 인스턴스 채팅 Redis Pub/Sub 전달은 개인 직접 구현·검증 범위다. 반면 Blue-Green 자동화와 `2,787 / 2,787` HTTP 200·관측 다운타임 `0s`는 팀의 Application Layer 검증 결과이며 개인 직접 측정 성과로 쓰지 않는다. [기여 감사 #17](https://github.com/hyeonseung-dev/bobfull-backend/pull/42)
+- Blue-Green의 App 계층 검증이 RDS, Redis/Valkey, Kafka까지 포함한 전체 시스템 HA를 뜻하지 않는다는 한계는 아래 시스템 아키텍처와 각 Evidence에 유지한다.
+
+---
+
 ## 01 프로젝트 소개
 
 | 항목 | 내용 |
