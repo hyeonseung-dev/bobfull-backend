@@ -176,6 +176,25 @@ class ChatRoomOutboxProcessorIntegrationTest {
     }
 
     @Test
+    void 동일_이벤트를_동시에_처리해도_ChatRoom은_한_건으로_COMPLETED에_수렴한다() throws Exception {
+        OutboxEvent event = pendingEvent(109L);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        try {
+            Future<?> first = executor.submit(() -> processor.process(event.getId()));
+            Future<?> second = executor.submit(() -> processor.process(event.getId()));
+            first.get();
+            second.get();
+        } finally {
+            executor.shutdownNow();
+        }
+
+        assertThat(chatRoomRepository.count()).isEqualTo(1);
+        assertThat(chatRoomRepository.findByReservationId(109L)).isPresent();
+        assertThat(reload(event).getStatus()).isEqualTo(OutboxEventStatus.COMPLETED);
+    }
+
+    @Test
     void stale_PROCESSING은_회수한_뒤_다시_처리한다() {
         // given
         OutboxEvent event = pendingEvent(105L);

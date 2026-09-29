@@ -3,11 +3,14 @@ package com.bobfull.payment.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bobfull.chat.outbox.service.ChatRoomOutboxProcessor;
 import com.bobfull.payment.entity.Payment;
 import com.bobfull.chat.repository.ChatRoomRepository;
+import com.bobfull.infrastructure.outbox.entity.OutboxEvent;
 import com.bobfull.infrastructure.outbox.entity.OutboxEventStatus;
 import com.bobfull.infrastructure.outbox.entity.OutboxEventType;
 import com.bobfull.infrastructure.outbox.repository.OutboxEventRepository;
+import com.bobfull.infrastructure.outbox.service.OutboxEventTransactionService;
 import com.bobfull.reservation.outbox.repository.EmailOutboxDeliveryRepository;
 import com.bobfull.reservation.outbox.service.EmailOutboxEventService;
 import com.bobfull.reservation.infrastructure.smtp.FakeReservationNotificationAdapter;
@@ -30,6 +33,7 @@ import com.bobfull.restaurant.sharedtable.repository.SharedTableRepository;
 import com.bobfull.restaurant.timeslot.entity.TimeSlot;
 import com.bobfull.restaurant.timeslot.repository.TimeSlotRepository;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
@@ -70,6 +74,7 @@ class PaymentReservationConfirmationTransactionIntegrationTest {
     @Autowired private RestaurantRepository restaurantRepository;
     @Autowired private FailureMode failureMode;
     @Autowired private ChatRoomRepository chatRoomRepository;
+    @Autowired private ChatRoomOutboxProcessor chatRoomOutboxProcessor;
     @Autowired private OutboxEventRepository outboxEventRepository;
     @Autowired private EmailOutboxDeliveryRepository emailOutboxDeliveryRepository;
     @Autowired private EmailOutboxEventService emailOutboxEventService;
@@ -194,6 +199,35 @@ class PaymentReservationConfirmationTransactionIntegrationTest {
         // ChatRoom 생성 실패는 Outbox 재시도로 남고 이메일 접수 알림에는 영향이 없다.
         awaitUntil(() -> notificationAdapter.reservationCreatedNotifications().size() == 1);
         assertThat(notificationAdapter.reservationCreatedNotifications()).hasSize(1);
+    }
+
+    @Test
+    void AFTER_COMMIT_signal이_유실돼도_커밋된_ChatRoom_Outbox는_새_처리_cycle에서_복구된다() {
+        TimeSlot timeSlot = timeSlot(4);
+        Payment payment = readyCreatePayment(timeSlot, 3);
+        failureMode.set(FailureMode.Type.AFTER_COMMIT_SIGNAL_LOSS);
+
+        paymentCompletionTransactionService.complete(payment.getPaymentId(), payment.getMemberId());
+
+        Payment completed = paymentRepository.findById(payment.getId()).orElseThrow();
+        assertThat(completed.getStatus()).isEqualTo(PaymentStatus.PAID);
+        assertThat(reservationRepository.count()).isEqualTo(1);
+        assertThat(reservationParticipantRepository.count()).isEqualTo(1);
+        assertThat(chatRoomRepository.count()).isZero();
+        OutboxEvent event = outboxEventRepository.findAll().stream()
+                .filter(candidate -> candidate.getEventType() == OutboxEventType.CHAT_ROOM_CREATION_REQUESTED)
+                .findFirst().orElseThrow();
+        assertThat(event.getStatus()).isEqualTo(OutboxEventStatus.PENDING);
+        assertThat(event.getAttemptCount()).isZero();
+
+        failureMode.reset();
+        chatRoomOutboxProcessor.processDueEvents(10);
+        chatRoomOutboxProcessor.process(event.getId());
+
+        assertThat(chatRoomRepository.count()).isEqualTo(1);
+        assertThat(chatRoomRepository.findByReservationId(completed.getReservationId())).isPresent();
+        assertThat(outboxEventRepository.findById(event.getId()).orElseThrow().getStatus())
+                .isEqualTo(OutboxEventStatus.COMPLETED);
     }
 
     @Test
@@ -355,6 +389,26 @@ class PaymentReservationConfirmationTransactionIntegrationTest {
 
         @Bean
         @Primary
+        ChatRoomOutboxProcessor signalControllableChatRoomOutboxProcessor(
+                OutboxEventRepository outboxEventRepository,
+                OutboxEventTransactionService transactionService,
+                com.bobfull.chat.service.ChatRoomCreationService chatRoomCreationService,
+                Clock clock,
+                FailureMode failureMode
+        ) {
+            return new ChatRoomOutboxProcessor(outboxEventRepository, transactionService, chatRoomCreationService, clock) {
+                @Override
+                public void signal(Long eventId) {
+                    if (failureMode.type == FailureMode.Type.AFTER_COMMIT_SIGNAL_LOSS) {
+                        return;
+                    }
+                    super.signal(eventId);
+                }
+            };
+        }
+
+        @Bean
+        @Primary
         ReservationConfirmationPort failureInjectingReservationConfirmationPort(
                 ReservationConfirmationService service,
                 ReservationRepository reservationRepository,
@@ -382,7 +436,7 @@ class PaymentReservationConfirmationTransactionIntegrationTest {
     }
 
     static class FailureMode {
-        enum Type { NONE, RESERVATION_SAVE_FAILURE, PARTICIPANT_SAVE_FAILURE, RESULT_LINK_FAILURE, CHAT_ROOM_CREATION_FAILURE, EMAIL_DELIVERY_FAILURE }
+        enum Type { NONE, RESERVATION_SAVE_FAILURE, PARTICIPANT_SAVE_FAILURE, RESULT_LINK_FAILURE, CHAT_ROOM_CREATION_FAILURE, EMAIL_DELIVERY_FAILURE, AFTER_COMMIT_SIGNAL_LOSS }
         private Type type = Type.NONE;
         void set(Type type) { this.type = type; }
         void reset() { this.type = Type.NONE; }
